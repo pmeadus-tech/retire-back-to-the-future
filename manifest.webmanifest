@@ -1,6 +1,6 @@
 {
-  "name": "Retirement Backcast Calculator",
-  "short_name": "Retirement Backcast",
+  "name": "Retire Back to the Future Calculator",
+  "short_name": "Retire Back",
   "description": "Reverse Engineer Your Retirement. Snap pay stubs and bills on your phone — photos stay on the device. From The Crude Dude.",
   "start_url": "./index.html",
   "scope": "./",

@@ -1,4 +1,4 @@
-# Retirement Backcast Calculator
+# Retire Back to the Future Calculator
 
 **Reverse Engineer Your Retirement**  
 from The Crude Dude (Perry Meadus, Alberta sole proprietor)
@@ -6,7 +6,7 @@ from The Crude Dude (Perry Meadus, Alberta sole proprietor)
 Static web app. Snap pay stubs and bills on your phone — **photos stay on the device, never uploaded** — and reverse-engineer a retirement / TFSA plan so you never miss your targets.
 
 ## Live intent
-Host on **GitHub Pages** from a public repo named `retirement-backcast` (not pushed yet — wait until GitHub is connected).  
+Host on **GitHub Pages** from a public repo named `retire-back-to-the-future` (not pushed yet — wait until GitHub is connected).  
 Placeholder URL in drafts: `{{CALC_URL}}`.
 
 ## Contents
@@ -33,10 +33,10 @@ python3 -m http.server 8765
 ```
 
 ## GitHub Pages (when connected)
-1. Create empty GitHub repo `retirement-backcast`.
-2. From this folder (or `/workspace/crude-dude/site/retirement-backcast/`):
+1. Create empty GitHub repo `retire-back-to-the-future`.
+2. From this folder:
    ```bash
-   git remote add origin git@github.com:<USER>/retirement-backcast.git
+   git remote add origin git@github.com:<USER>/retire-back-to-the-future.git
    git push -u origin main
    ```
 3. Settings → Pages → Deploy from branch `main` / root (or `/docs` if you prefer).
