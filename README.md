@@ -1,7 +1,7 @@
 # Retire Back to the Future Calculator
 
 **Reverse Engineer Your Retirement**  
-from The Crude Dude (Perry Meadus, Alberta sole proprietor)
+from The Crude Dude
 
 Static web app. Snap pay stubs and bills on your phone — **photos stay on the device, never uploaded** — and reverse-engineer a retirement / TFSA plan so you never miss your targets.
 
@@ -24,7 +24,7 @@ Placeholder URL in drafts: `{{CALC_URL}}`.
 Everything stays on this device (`localStorage` + IndexedDB). No ads, no analytics. Feedback boxes save locally only.
 
 ## Legal contact
-hello@crudedude.ca · Effective date on legal pages: November 9, 2026
+contact@crudedude.ca · Effective date on legal pages: November 9, 2026
 
 ## Local preview
 ```bash
