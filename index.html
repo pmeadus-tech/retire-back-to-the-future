@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Retirement Backcast Calculator — Reverse Engineer Your Retirement</title>
+<meta name="description" content="Retirement Backcast Calculator — Reverse Engineer Your Retirement. Upload pay stubs and bills on your phone (photos never leave the device) and reverse-engineer a plan so you never miss your targets. From The Crude Dude.">
+<meta name="theme-color" content="#b5541c">
+<meta name="application-name" content="Retirement Backcast Calculator">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Retirement Backcast">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Crude Dude">
+<meta property="og:title" content="Retirement Backcast Calculator — Reverse Engineer Your Retirement">
+<meta property="og:description" content="Reverse Engineer Your Retirement. Snap pay stubs and bills on your phone — photos stay on the device. From The Crude Dude.">
+<meta property="og:image" content="og/og-share.jpg">
+<meta property="og:locale" content="en_CA">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Retirement Backcast Calculator — Reverse Engineer Your Retirement">
+<meta name="twitter:description" content="Reverse Engineer Your Retirement. Photos stay on your device. From The Crude Dude.">
+<meta name="twitter:image" content="og/og-share.jpg">
+<style>
+  :root{--bg:#f7f5f0;--card:#fff;--ink:#1f1f1f;--soft:#5b5b5b;--line:#ddd8cc;--accent:#b5541c;--accent2:#2f6f8f;--warn:#a12a1a;--ok:#2e6b2e;--c4:#2f6f8f;--c6:#b5541c;--c8:#3c8a4a}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 Georgia,"Times New Roman",serif}
+  .wrap{max-width:780px;margin:0 auto;padding:24px 16px 48px}
+  h1{font-size:28px;margin:0 0 4px}
+  .lead{color:var(--soft);margin:0 0 20px}
+  section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin:0 0 18px}
+  h2{font-size:21px;margin:0 0 4px}
+  h3{font-size:17px;margin:14px 0 4px}
+  .say{color:var(--soft);margin:0 0 12px}
+  .row{display:flex;flex-wrap:wrap;gap:12px;margin:0 0 12px}
+  label{display:flex;flex-direction:column;font:14px/1.3 Arial,Helvetica,sans-serif;color:var(--soft);flex:1 1 140px}
+  label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink);font-size:15px}
+  label.inline input{margin:0;width:18px;height:18px}
+  input,select{font:16px Arial,Helvetica,sans-serif;padding:8px;border:1px solid var(--line);border-radius:8px;margin-top:4px;background:#fff;color:var(--ink)}
+  input[type=file]{display:none}
+  .btns{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+  button,.bigbtn{font:15px Arial,Helvetica,sans-serif;padding:7px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink);cursor:pointer}
+  button.on,button.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .bigbtn{display:inline-flex;align-items:center;justify-content:center;border-radius:12px;padding:14px 18px;font-weight:600;font-size:16px;background:#fff8f2;border-color:#e6c9b3;min-height:52px}
+  .out{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0}
+  .box{flex:1 1 130px;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .box b{display:block;font:600 21px Arial,Helvetica,sans-serif}
+  .box span{font:13px Arial,Helvetica,sans-serif;color:var(--soft)}
+  table{width:100%;border-collapse:collapse;font:15px Arial,Helvetica,sans-serif;margin:8px 0}
+  th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}
+  th:first-child,td:first-child{text-align:left}
+  td.l,th.l{text-align:left}
+  tr.hit td{font-weight:700}
+  .scroll{max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:8px}
+  .scroll table{margin:0}
+  .scroll th{position:sticky;top:0;background:#fff}
+  .note{font:14px/1.4 Arial,Helvetica,sans-serif;color:var(--soft);margin:8px 0 0}
+  .warn{border-left:4px solid var(--warn);background:#fbeeea;padding:10px 12px;border-radius:6px;font:15px/1.4 Arial,Helvetica,sans-serif;margin:10px 0}
+  .good{border-left:4px solid var(--ok);background:#edf5ec;padding:10px 12px;border-radius:6px;font:15px/1.4 Arial,Helvetica,sans-serif;margin:10px 0}
+  .hint{border-left:4px solid var(--accent2);background:#eaf2f6;padding:10px 12px;border-radius:6px;font:15px/1.4 Arial,Helvetica,sans-serif;margin:10px 0}
+  svg{width:100%;height:auto;display:block}
+  .legend{display:flex;flex-wrap:wrap;gap:16px;font:13px Arial,Helvetica,sans-serif;color:var(--soft);margin:8px 0}
+  .sw{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-right:6px}
+  a{color:var(--accent2)}
+  ol,ul{margin:8px 0;padding-left:22px;font:16px/1.5 Arial,Helvetica,sans-serif}
+  li{margin:5px 0}
+  details.x{border:1px solid var(--line);border-radius:10px;margin:10px 0}
+  details.x>summary{cursor:pointer;padding:12px 14px;font:600 16px Arial,Helvetica,sans-serif}
+  details.x .xb{padding:0 14px 14px}
+  .billgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .bill{border:1px solid var(--line);border-radius:10px;padding:10px}
+  .bill img{width:100%;max-height:140px;object-fit:cover;border-radius:8px;margin:6px 0;border:1px solid var(--line)}
+  .bill .meta{font:13px/1.4 Arial,Helvetica,sans-serif;color:var(--soft)}
+  .creep{color:var(--warn);font-weight:700}
+  .verdict{font:700 20px Arial,Helvetica,sans-serif;margin:6px 0}
+  .stepper{display:inline-flex;align-items:center;gap:8px}
+  .stepper b{font:600 22px Arial,Helvetica,sans-serif;min-width:32px;text-align:center}
+  .counter{font:700 30px Arial,Helvetica,sans-serif}
+  mark{background:#ffe8a3;padding:0 2px}
+  .clause{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:8px 0;font:14px/1.45 Arial,Helvetica,sans-serif}
+  .busy{font:14px Arial,Helvetica,sans-serif;color:var(--accent2)}
+  footer{text-align:center;color:var(--soft);font:14px Arial,Helvetica,sans-serif;margin-top:10px}
+  footer p{margin:6px 0}
+  footer a{margin:0 2px}
+  .topbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin:0 0 14px}
+  .topbar .brand{display:flex;align-items:center;gap:10px}
+  .topbar img{width:48px;height:48px;border-radius:10px;background:#fff;border:1px solid var(--line)}
+  .topbar a.sub{font:15px Arial,Helvetica,sans-serif;color:var(--accent2);text-decoration:none;border:1px solid #c9dde8;background:#eaf2f6;padding:8px 12px;border-radius:999px}
+  .topbar a.sub:hover{text-decoration:underline}
+  .privacy{font:14px/1.4 Arial,Helvetica,sans-serif;color:var(--soft);margin:0 0 16px}
+  textarea{font:16px Arial,Helvetica,sans-serif;padding:10px;border:1px solid var(--line);border-radius:8px;margin-top:4px;background:#fff;color:var(--ink);min-height:90px;resize:vertical;width:100%}
+  .fbgrid{display:grid;gap:12px;margin:8px 0}
+
+  .disclaimer{font:14px/1.4 Arial,Helvetica,sans-serif;color:var(--soft);margin:8px 0 0;padding:10px 12px;border:1px dashed var(--line);border-radius:8px;background:#faf8f3}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><img src="icons/icon-192.png" width="48" height="48" alt="Crude Dude mascot"><span style="font:600 15px Arial,Helvetica,sans-serif;color:var(--soft)">The Crude Dude</span></div>
+    <a class="sub" href="https://crudedude.ca/subscribe">Get the newsletter: https://crudedude.ca/subscribe</a>
+  </div>
+  <h1>Retirement Backcast Calculator</h1>
+  <p class="tagline" style="font:600 18px Arial,Helvetica,sans-serif;color:var(--accent);margin:0 0 8px">Reverse Engineer Your Retirement</p>
+  <p class="from" style="font:14px Arial,Helvetica,sans-serif;color:var(--soft);margin:0 0 12px">from The Crude Dude</p>
+  <p class="lead">Pull up a bucket. Snap your pay stubs and bills on this phone — the photos stay here, never uploaded — and reverse-engineer your retirement plan so you never miss your targets. Hitch money, TFSA room, debt, overtime, the whole crew picture. All amounts in Canadian dollars.</p>
+  <p class="privacy"><b>Everything stays on this device.</b> Your numbers, photos and bills are saved in this browser only. Nothing is uploaded to Crude Dude.</p>
+  <p class="disclaimer">Not financial advice. Numbers are estimates; check your real TFSA room in CRA My Account.</p>
+
+  <section>
+    <h2>1. Your runway and your room</h2>
+    <p class="say">Birthday, quit age, and how much TFSA room you've got sitting there.</p>
+    <div class="row">
+      <label>Birth year<input class="sv" id="by" type="number" value="1991"></label>
+      <label>Month (1-12)<input class="sv" id="bm" type="number" value="5"></label>
+      <label>Day<input class="sv" id="bd" type="number" value="14"></label>
+      <label>Retire at age<input class="sv" id="age" type="number" value="65"></label>
+    </div>
+    <div class="row">
+      <label>Year you became a resident (blank if since 18)<input class="sv" id="res" type="number" placeholder="e.g. 2015"></label>
+      <label>Your room from CRA (optional)<input class="sv" id="craRoom" type="number" placeholder="e.g. 42000"></label>
+    </div>
+    <div id="cdOut"></div>
+    <div id="roomOut"></div>
+  </section>
+
+  <section>
+    <h2>2. Per hitch</h2>
+    <p class="say">Forget "someday." Pick your rotation and an amount you set aside every hitch. Overtime and bonus money is the easiest place to start, since you never got used to living on it.</p>
+    <div class="row">
+      <label>Your rotation<select class="sv" id="rot">
+        <option value="14/14">14 on, 14 off</option><option value="7/7">7 on, 7 off</option><option value="10/4">10 on, 4 off</option><option value="4/4">4 on, 4 off</option><option value="mf">Monday to Friday (a week = a hitch)</option><option value="custom">Custom</option></select></label>
+      <label id="customOn" style="display:none">Days on<input class="sv" id="cOn" type="number" value="21"></label>
+      <label id="customOff" style="display:none">Days off<input class="sv" id="cOff" type="number" value="7"></label>
+    </div>
+    <div class="row">
+      <label>Set aside per hitch ($)<input class="sv" id="perHitch" type="number" value="500" min="0"></label>
+      <label>Plus per overtime shift ($)<input class="sv" id="otAmt" type="number" value="0" min="0"></label>
+      <label>Overtime shifts a year<input class="sv" id="otShifts" type="number" value="0" min="0"></label>
+      <label>In your TFSA now ($)<input class="sv" id="tfsaNow" type="number" value="0" min="0"></label>
+    </div>
+    <div id="hitchOut"></div>
+    <div class="legend"><span><i class="sw" style="background:var(--c4)"></i>4% a year</span><span><i class="sw" style="background:var(--c6)"></i>6% a year</span><span><i class="sw" style="background:var(--c8)"></i>8% a year</span><span><i class="sw" style="background:#9a9a9a"></i>$1,000,000</span></div>
+    <div id="hitchChart"></div>
+    <div class="scroll" id="hitchTable"></div>
+    <p class="note">Grows at the same rate every year, with your yearly amount going in on each birthday. Real markets wobble.</p>
+  </section>
+
+  <section>
+    <h2>3. Other money</h2>
+    <p class="say">One-off money is where plans get made or blown. Tell grandpa what landed this year.</p>
+    <details class="x" id="otherMoney"><summary>Open the list: inheritance, bonus, refund, sold something...</summary><div class="xb" id="omList"></div></details>
+    <div id="omOut"></div>
+  </section>
+
+  <section>
+    <h2>4. Pay stub and your Stacking fund</h2>
+    <p class="say">Snap your pay stub, check the boxes, and see what an extra shift really puts in your pocket after tax. Then stack it.</p>
+    <div class="btns"><label class="bigbtn" for="stubCam">Snap my pay stub</label><input type="file" id="stubCam" accept="image/*" capture="environment"><button id="stubDel" style="display:none">Delete stub photo</button></div>
+    <div id="stubThumb"></div><div id="stubBusy" class="busy"></div>
+    <p class="note">Black out your SIN and employee number first. The stub stays on this phone. The amounts it reads are a best guess, so check every box.</p>
+    <div class="row">
+      <label>Base hourly rate ($)<input class="sv" id="stRate" type="number" step="0.01"></label>
+      <label>Overtime rate<select class="sv" id="stMult"><option value="1.5">Time and a half (1.5x)</option><option value="2">Double time (2x)</option></select></label>
+      <label>Hours per shift<input class="sv" id="stHours" type="number" value="12"></label>
+    </div>
+    <div class="row">
+      <label>Gross this pay ($)<input class="sv" id="stGross" type="number"></label>
+      <label>Year-to-date gross ($)<input class="sv" id="stYtdGross" type="number"></label>
+      <label>Year-to-date CPP ($)<input class="sv" id="stYtdCpp" type="number"></label>
+      <label>Year-to-date EI ($)<input class="sv" id="stYtdEi" type="number"></label>
+    </div>
+    <div class="row">
+      <label>Your yearly income ($, blank = estimate from year-to-date)<input class="sv" id="stIncome" type="number"></label>
+    </div>
+    <p style="margin:6px 0">Extra shifts this month:
+      <span class="stepper"><button id="shMinus">-</button><b id="shN">0</b><button id="shPlus">+</button></span></p>
+    <div id="stubOut"></div>
+    <h3>Stacking fund</h3>
+    <div id="stackOut"></div>
+    <div class="row"><label>Moved some? Amount ($)<input id="moveAmt" type="number" min="0"></label></div>
+    <div class="btns"><button class="primary" id="stackAdd">Add this month's extra-shift money</button><button id="stackMoveAll">Moved it all to my TFSA</button><button id="stackMoveSome">Moved that amount to my TFSA</button><button id="stackReset">Reset the fund</button></div>
+    <p class="note">Tax, CPP and EI here are estimates for an Alberta worker using 2026 rates, not your exact payroll. CPP and EI only come off until you hit the 2026 maximums.</p>
+  </section>
+
+  <section id="debtSec">
+    <h2>5. Debt payoff plan</h2>
+    <p class="say">First draft of your way out. Every dollar of 20% interest you kill is a guaranteed 20% return. No stock does that.</p>
+    <h3>First, the hard questions</h3>
+    <div class="row">
+      <label>Have you missed any payments?<select class="sv" id="dbMissed"><option value="">Pick one</option><option>No</option><option>Yes</option></select></label>
+      <label>Are you falling behind?<select class="sv" id="dbBehind"><option value="">Pick one</option><option>No</option><option>A little</option><option>A lot</option></select></label>
+    </div>
+    <p class="note" style="margin:0 0 8px">Which payments have you missed? Tick "Missed or behind" on each debt below and fill in how many and how much is past due.</p>
+    <div id="dbRows"></div>
+    <div class="btns"><button id="dbAdd">+ Add a debt</button></div>
+    <h3>Be straight with grandpa</h3>
+    <div class="row">
+      <label>Set up an automatic transfer every week (or payday)?<select class="sv" id="wTransfer"><option value="">Pick one</option><option>Yes</option><option>No</option><option>Maybe</option></select></label>
+      <label>Cut one habit for 90 days?<select class="sv" id="wHabit"><option value="">Pick one</option><option>Yes</option><option>No</option><option>Maybe</option></select></label>
+    </div>
+    <div class="row">
+      <label>Put overtime toward debt?<select class="sv" id="wOt"><option value="">Pick one</option><option>Yes</option><option>No</option><option>Maybe</option></select></label>
+      <label>Stop adding to the cards while you pay them down?<select class="sv" id="wCards"><option value="">Pick one</option><option>Yes</option><option>No</option><option>Maybe</option></select></label>
+    </div>
+    <div class="row">
+      <label>Extra toward debt ($)<input class="sv" id="dbExtra" type="number" value="0" min="0"></label>
+      <label>How often<select class="sv" id="dbExtraPer"><option value="week">Every week</option><option value="payday">Every payday (2 weeks)</option></select></label>
+      <label>Emergency fund (months of bills)<input class="sv" id="efMonths" type="number" step="0.5"></label>
+    </div>
+    <p style="margin:8px 0 4px;font:15px Arial,Helvetica,sans-serif">Extra shifts go to:</p>
+    <div class="btns">
+      <label class="inline"><input type="radio" name="otRoute" value="debt" class="svr">Debt</label>
+      <label class="inline"><input type="radio" name="otRoute" value="tfsa" class="svr" checked>TFSA</label>
+      <label class="inline"><input type="radio" name="otRoute" value="split" class="svr">Split 50-50</label>
+    </div>
+    <label class="inline"><input type="checkbox" id="debtFirst" class="sv">Debt first mode (pauses TFSA money everywhere on this page)</label>
+    <div id="dbSuggest"></div>
+    <div id="dbOut"></div>
+    <div id="dbChart"></div>
+  </section>
+
+  <section>
+    <h2>6. Monthly bills</h2>
+    <p class="say">Snap it, check the amount, done. Grandpa will tell you if things are creeping up on you.</p>
+    <div class="row"><label>Month<input id="billMonth" type="month"></label></div>
+    <div class="billgrid" id="billGrid"></div>
+    <div class="row" style="margin-top:12px"><label>Another bill, what's it called?<input id="newBillName" type="text" placeholder="e.g. Truck insurance"></label></div>
+    <div class="btns"><button id="addBill">+ Add another bill</button></div>
+    <p class="note">Black out account numbers if you want. Photos stay on this phone only. Nothing leaves it.</p>
+    <h3>How's the month looking?</h3>
+    <div class="row">
+      <label>Take-home pay per month ($)<input class="sv" id="payMonth" type="number"></label>
+      <label>Or take-home per hitch ($)<input class="sv" id="payHitch" type="number"></label>
+      <label>Debt payments per month ($)<input class="sv" id="debtsMo" type="number" value="0"></label>
+    </div>
+    <div id="assessOut"></div>
+    <div id="billChart"></div>
+  </section>
+
+  <section>
+    <h2>7. Snap spending</h2>
+    <p class="say">Receipts, bank statements, credit card statements. Snap them or load the PDF and this phone sorts the spending for you.</p>
+    <div class="row">
+      <label>What is it?<select id="spType"><option value="receipt">Receipt</option><option value="bank">Bank statement</option><option value="cc">Credit card statement</option></select></label>
+    </div>
+    <div class="btns"><label class="bigbtn" for="spCam">Snap it</label><input type="file" id="spCam" accept="image/*" capture="environment" multiple><label class="bigbtn" for="spPdf">Load a PDF</label><input type="file" id="spPdf" accept="application/pdf" multiple></div>
+    <label class="inline"><input type="checkbox" id="spDelPhoto" checked>Delete the photo after reading (only the date, store, amount and category are kept)</label>
+    <label class="inline" style="color:var(--soft)"><input type="checkbox" disabled>AI sorting (opt-in) coming later; would send the image to a Canadian-hosted service only if you switch it on.</label>
+    <div id="spBusy" class="busy"></div>
+    <p class="note">Black out card and account numbers. Everything stays on this phone. Payments and credits are marked and left out of the totals.</p>
+    <div id="spOut"></div>
+  </section>
+
+  <section>
+    <h2>8. RRSP room</h2>
+    <p class="say">RRSP room is a different bucket from TFSA room. Here's roughly how much you've got.</p>
+    <div class="row">
+      <label>Last year's employment income ($)<input class="sv" id="rrIncome" type="number"></label>
+      <label>Pension adjustment, from your T4 box 52 (optional)<input class="sv" id="rrPa" type="number"></label>
+      <label>Unused room carried forward (optional)<input class="sv" id="rrCarry" type="number"></label>
+    </div>
+    <p class="note">Check your Notice of Assessment or CRA My Account for your real RRSP number.</p>
+    <div id="rrOut"></div>
+    <label class="inline"><input type="checkbox" id="rrProj" class="sv">Project my RRSP room</label>
+    <div class="row" id="rrGrowRow" style="display:none"><label>Income growth per year (%)<input class="sv" id="rrGrow" type="number" value="2" step="0.5"></label></div>
+    <div id="rrProjOut"></div>
+    <div class="hint">Grandpa's take, from the Crude Dude TFSA vs RRSP research: TFSA first for most young workers and anybody in a lower tax bracket. The RRSP gets more valuable once you're in the higher brackets, 30.5% and up combined in Alberta. And if the company matches a group RRSP, take that first. Arguing with free money is how you stay broke. RRSP money for a tax year usually has to go in by about March 1 of the next year. RRSP room is not TFSA room; they're two separate buckets.</div>
+  </section>
+
+  <section>
+    <h2>9. My benefits</h2>
+    <p class="say">Your benefits booklet is full of money most guys never claim. Load it once and ask it questions.</p>
+    <label class="inline"><input type="checkbox" id="bnConsent">I'm OK with this phone reading my benefits booklet; nothing is sent anywhere</label>
+    <div class="btns" style="margin-top:10px"><label class="bigbtn" for="bnCam" id="bnCamLbl">Snap the pages</label><input type="file" id="bnCam" accept="image/*" capture="environment" multiple disabled><label class="bigbtn" for="bnPdf" id="bnPdfLbl">Load the PDF</label><input type="file" id="bnPdf" accept="application/pdf" disabled><button id="bnDelete">Delete my benefits info</button></div>
+    <div id="bnBusy" class="busy"></div>
+    <p class="note">Only the words are kept on this phone. The photos and PDF are thrown out as soon as they're read.</p>
+    <div id="bnStatus"></div>
+    <div class="row"><label>Ask your booklet<input id="bnQ" type="text" placeholder="e.g. are glasses covered?"></label></div>
+    <div class="btns" id="bnQuick"></div>
+    <label class="inline" style="color:var(--soft)"><input type="checkbox" disabled>Plain-English AI answers (opt-in, coming soon)</label>
+    <div id="bnOut"></div>
+    <p class="note">This reads your booklet, it doesn't replace it. Check with your plan provider before big spending.</p>
+  </section>
+
+  <section>
+    <h2>10. Whole crew</h2>
+    <p class="say">Now picture the whole crew doing it. Every person has their OWN TFSA in their own name. This is not a pooled account and nobody shares money. It's just what happens when everybody does the same simple thing.</p>
+    <div class="row">
+      <label>Crew size<input class="sv" id="crewN" type="number" value="8" min="1" max="60"></label>
+      <label>Each person sets aside per hitch ($)<input class="sv" id="crewHitch" type="number" value="500"></label>
+      <label>Youngest on the crew (age)<input class="sv" id="crewYoung" type="number" value="22"></label>
+      <label>Oldest on the crew (age)<input class="sv" id="crewOld" type="number" value="58"></label>
+      <label>Everybody retires at<input class="sv" id="crewRet" type="number" value="65"></label>
+    </div>
+    <div class="btns" id="crewRate"><button data-r="4">4% a year</button><button data-r="6" class="on">6% a year</button><button data-r="8">8% a year</button></div>
+    <div id="crewOut"></div>
+  </section>
+
+  <section id="cra">
+    <h2>Get your exact room from the CRA</h2>
+    <p class="say">My numbers are a good guess. The CRA keeps the real count, and you can look it up yourself, kiddo.</p>
+    <p><a href="https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services.html"><b>Sign in to your CRA account (or sign up for one)</b></a></p>
+    <ol>
+      <li>Sign in, or hit "Register" if you've never set one up.</li>
+      <li>Pick <b>Individual account</b>.</li>
+      <li>Click <b>Savings and pension plans</b>, then <b>View TFSA details</b>.</li>
+      <li>Click <b>Contribution room</b>. That's your number.</li>
+    </ol>
+    <div class="hint">Heads up: CRA's number is your room as of January 1. It won't count anything you've put in this year, and last year's moves only show up after CRA's spring update (around April). Take this year's deposits off it yourself before you put more in.</div>
+    <p class="note">Click path from CRA: <a href="https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/tax-free-savings-account/contributing/calculate-room.html">canada.ca: Calculate your TFSA contribution room</a></p>
+  </section>
+
+  <section>
+    <h2>Crew non-negotiables</h2>
+    <ol>
+      <li>The plan isn't hard. Sticking to it is.</li>
+      <li>Buy the truck that fits the budget, not the one with $15,000 of options, and pay it off before the warranty runs out.</li>
+      <li>That truck sits in the driveway more than you drive it. Remember that at the dealership.</li>
+      <li>Overtime goes to the TFSA first. You never lived on it, so you won't miss it.</li>
+      <li>Don't overcontribute. Going over your room costs 1% a month on the extra until it's out.</li>
+      <li>Take money out and you get the room back on January 1 next year, not the same year.</li>
+    </ol>
+  </section>
+
+
+  <section id="feedback">
+    <h2>Tell grandpa what you think</h2>
+    <p class="say">This whole thing is about your TFSA, your budget and the choices you make, not picking stocks. Did it help? Be straight with me.</p>
+    <div class="fbgrid">
+      <label>What do you like about it?<textarea id="fbLike" data-fb="fbLike" placeholder="What worked for you?"></textarea></label>
+      <label>What don't you like about it?<textarea id="fbDislike" data-fb="fbDislike" placeholder="What rubbed you the wrong way?"></textarea></label>
+      <label>What do you think it should have?<textarea id="fbShould" data-fb="fbShould" placeholder="What's missing?"></textarea></label>
+    </div>
+    <p class="note">This saves on this device with the rest of your answers. Nothing is sent anywhere.</p>
+  </section>
+
+  <footer>
+    <p>I might be a fictional character, but this money talk is as real as it gets. Not financial advice. Numbers are estimates; check your real TFSA room in CRA My Account.</p>
+    <p><a href="https://crudedude.ca/subscribe">Get the newsletter</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="delete-account.html">Delete account</a></p>
+    <p style="margin-top:8px">Retirement Backcast Calculator · from The Crude Dude</p>
+  </footer>
+</div>
+<script>
+/* Crude Dude TFSA Calculator: Crew Edition. Everything stays on this device:
+   inputs in localStorage, photos/text in IndexedDB. OCR (tesseract.js) and PDF reader
+   (pdf.js) are vendored under ./vendor/ so the app can run without a CDN; images and
+   documents are processed in this browser and never sent anywhere. */
+var LIMITS={2009:5000,2010:5000,2011:5000,2012:5000,2013:5500,2014:5500,2015:10000,2016:5500,2017:5500,2018:5500,2019:6000,2020:6000,2021:6000,2022:6000,2023:6500,2024:7000,2025:7000,2026:7000};
+var LAST_KNOWN=2026,LIMIT_NOW=7000,RATES=[4,6,8];
+var RRSP_MAX={2025:32490,2026:33810,2027:35390,2028:36390};
+var BRACKETS=[[0,.22],[58523,.285],[61200,.305],[117045,.36],[154259,.38],[181440,.4129],[185111,.4229],[246813,.4329],[258482,.47],[370220,.48]];
+var CPP_RATE=.0595,CPP_MAX=4230.45,CPP2_RATE=.04,CPP2_MAX=416,EI_RATE=.0163,EI_MAX=1123.07;
+var LS="crudeDudeCrew.v1";
+function $(id){return document.getElementById(id);}
+function raw(id){var e=$(id);return e?String(e.value).trim():"";}
+function num(id){var v=parseFloat(raw(id));return isFinite(v)?v:0;}
+function money(x,c){return (x<0?"-":"")+"$"+Math.abs(x).toLocaleString("en-CA",{minimumFractionDigits:c?2:0,maximumFractionDigits:c?2:0});}
+function m2(x){return money(x,true);}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function box(v,l,extra){return '<div class="box"><b>'+v+'</b><span>'+l+'</span>'+(extra||'')+'</div>';}
+function brk(y){return '<div class="note" style="margin:2px 0 0">= '+m2(y/12)+'/month · '+m2(y/52)+'/week · '+m2(y/365)+'/day</div>';}
+function brkOver(total,years,label){if(!(years>0))return '';var y=total/years;return '<div class="note" style="margin:2px 0 0">'+label+': '+m2(y)+'/year = '+m2(y/12)+'/month · '+m2(y/52)+'/week · '+m2(y/365)+'/day</div>';}
+function brkLeft(total,label){var d=Math.max(1,Math.round((new Date(thisYear,11,31)-today)/86400000)+1);return '<div class="note" style="margin:2px 0 0">'+label+' ('+d+' days left): '+m2(total/(d/30.4375))+'/month · '+m2(total/(d/7))+'/week · '+m2(total/d)+'/day</div>';}
+function addYears(y,m,d,n){var ty=y+n,dim=new Date(ty,m,0).getDate();return new Date(ty,m-1,Math.min(d,dim));}
+function short(v){if(v>=1e6)return "$"+(v/1e6).toFixed(1)+"M";if(v>=1e3)return "$"+Math.round(v/1e3)+"K";return "$"+Math.round(v);}
+var today=new Date();today=new Date(today.getFullYear(),today.getMonth(),today.getDate());
+var thisYear=today.getFullYear();
+var OPTS={year:"numeric",month:"long",day:"numeric"};
+function ymKey(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");}
+function ymShift(ym,k){var p=ym.split("-");var d=new Date(+p[0],+p[1]-1+k,1);return ymKey(d);}
+function ymLabel(ym){var p=ym.split("-");return new Date(+p[0],+p[1]-1,1).toLocaleDateString("en-CA",{month:"short",year:"numeric"});}
+
+/* ---------- storage ---------- */
+var STATE={inputs:{},bills:{},stack:{fund:0,moved:[],year:thisYear},other:{},debts:[],spend:[],cats:{},ocrBills:{},feedback:{}};
+function loadState(){try{var s=JSON.parse(localStorage.getItem(LS)||"null");if(s)for(var k in s)STATE[k]=s[k];}catch(e){}}
+function saveState(){try{localStorage.setItem(LS,JSON.stringify(STATE));}catch(e){}}
+var dbp=null;
+function idb(){if(dbp)return dbp;dbp=new Promise(function(res,rej){var r=indexedDB.open("crudeDudeCrew",1);r.onupgradeneeded=function(){r.result.createObjectStore("files");};r.onsuccess=function(){res(r.result);};r.onerror=function(){rej(r.error);};});return dbp;}
+function idbDo(mode,fn){return idb().then(function(db){return new Promise(function(res,rej){var tx=db.transaction("files",mode),st=tx.objectStore("files"),out=fn(st);tx.oncomplete=function(){res(out&&out.result!==undefined?out.result:undefined);};tx.onerror=function(){rej(tx.error);};});});}
+function idbPut(k,v){return idbDo("readwrite",function(s){return s.put(v,k);});}
+function idbGet(k){return idbDo("readonly",function(s){return s.get(k);});}
+function idbDel(k){return idbDo("readwrite",function(s){return s.delete(k);});}
+
+/* ---------- lazy helpers: compress, OCR, PDF ---------- */
+var scripts={};
+function loadScript(u){if(scripts[u])return scripts[u];scripts[u]=new Promise(function(res,rej){var s=document.createElement("script");s.src=u;s.onload=res;s.onerror=function(){delete scripts[u];rej(new Error("load"));};document.head.appendChild(s);});return scripts[u];}
+function withTimeout(p,ms){return Promise.race([p,new Promise(function(_,rej){setTimeout(function(){rej(new Error("timeout"));},ms);})]);}
+function compress(file,max){max=max||1200;return createImageBitmap(file).then(function(bm){var s=Math.min(1,max/Math.max(bm.width,bm.height));var c=document.createElement("canvas");c.width=Math.round(bm.width*s);c.height=Math.round(bm.height*s);c.getContext("2d").drawImage(bm,0,0,c.width,c.height);return new Promise(function(res){c.toBlob(function(b){res(b);},"image/jpeg",0.82);});});}
+function ocr(blob){ // on-device OCR; returns text or "" if it fails or we're offline
+  return withTimeout(loadScript("vendor/tesseract/tesseract.min.js").then(function(){if(window.Tesseract&&Tesseract.createWorker){/* v5 path */ } return Tesseract.recognize(blob,"eng",{workerPath:"vendor/tesseract/worker.min.js",corePath:"vendor/tesseract/core/",langPath:"vendor/tesseract/lang"});}).then(function(r){return (r&&r.data&&r.data.text)||"";}),90000).catch(function(){return "";});
+}
+function pdfPages(file){ // on-device PDF text; returns [[line,...] per page]
+  return loadScript("vendor/pdfjs/pdf.min.js").then(function(){
+    pdfjsLib.GlobalWorkerOptions.workerSrc="vendor/pdfjs/pdf.worker.min.js";
+    return file.arrayBuffer();}).then(function(buf){return pdfjsLib.getDocument({data:buf}).promise;}).then(function(pdf){
+    var out=[],chain=Promise.resolve();
+    for(var p=1;p<=pdf.numPages;p++)(function(p){chain=chain.then(function(){return pdf.getPage(p).then(function(pg){return pg.getTextContent().then(function(tc){
+      var rows={};tc.items.forEach(function(it){var y=Math.round(it.transform[5]/3)*3;(rows[y]=rows[y]||[]).push({x:it.transform[4],s:it.str});});
+      var ys=Object.keys(rows).map(Number).sort(function(a,b){return b-a;});
+      var lines=ys.map(function(y){return rows[y].sort(function(a,b){return a.x-b.x;}).map(function(o){return o.s;}).join(" ").replace(/\s+/g," ").trim();}).filter(Boolean);
+      if(lines.join("").length<20){ // scanned page: OCR fallback
+        var vp=pg.getViewport({scale:2}),c=document.createElement("canvas");c.width=vp.width;c.height=vp.height;
+        return pg.render({canvasContext:c.getContext("2d"),viewport:vp}).promise.then(function(){return new Promise(function(r){c.toBlob(r,"image/png");});}).then(ocr).then(function(t){out.push(t.split(/\n/).map(function(s){return s.trim();}).filter(Boolean));});
+      }
+      out.push(lines);});});});})(p);
+    return chain.then(function(){return out;});
+  });
+}
+var AMT_RE=/\$?\s?(\d{1,3}(?:,\d{3})+|\d+)\.(\d{2})\b/g;
+function amountsIn(line){var a=[],m;AMT_RE.lastIndex=0;while((m=AMT_RE.exec(line)))a.push(parseFloat(m[1].replace(/,/g,"")+"."+m[2]));return a;}
+function suggestDue(text){ // largest $ figure near "total / amount due", else largest overall
+  var lines=text.split(/\n/),best=null,all=[];
+  lines.forEach(function(l){var a=amountsIn(l);all=all.concat(a);if(/(amount|total|balance)\s*(due|owing|payable)|please pay|new balance|total\b(?!\s*paid)/i.test(l)&&!/sub\s*total/i.test(l)&&a.length){var mx=Math.max.apply(null,a);if(best===null||mx>best)best=mx;}});
+  if(best===null&&all.length)best=Math.max.apply(null,all);return best;
+}
+
+/* ---------- 1. runway and room ---------- */
+var CD=null,ROOM=null,PLAN=null,STUB=null,DEBT=null;
+function limitFor(y){return LIMITS[y]!==undefined?LIMITS[y]:(y>LAST_KNOWN?LIMIT_NOW:0);}
+function debtFirst(){return $("debtFirst").checked;}
+function movedThisYear(){var s=STATE.stack;return (s.moved||[]).filter(function(m){return m.y===thisYear;}).reduce(function(a,m){return a+m.amt;},0);}
+function remainingRoom(){return ROOM?Math.max(0,ROOM.now-movedThisYear()):0;}
+function runway(){
+  var by=Math.round(num("by")),bm=Math.round(num("bm")),bd=Math.round(num("bd")),age=Math.round(num("age"));CD=null;
+  if(by<1900||bm<1||bm>12||bd<1||bd>31||age<1){$("cdOut").innerHTML='<div class="hint">Punch in a real birthday and I\'ll get counting.</div>';}
+  else{
+    var ret=addYears(by,bm,bd,age),cur=thisYear-by;if(today<addYears(by,bm,bd,cur))cur--;
+    if(ret<=today){$("cdOut").innerHTML='<div class="good">You\'re already '+cur+'. You made it to '+age+'. Time to enjoy it.</div>';}
+    else{var y=ret.getFullYear()-today.getFullYear(),m=ret.getMonth()-today.getMonth(),d=ret.getDate()-today.getDate();
+      if(d<0){m--;d+=new Date(ret.getFullYear(),ret.getMonth(),0).getDate();}if(m<0){y--;m+=12;}
+      CD={by:by,bm:bm,bd:bd,age:age,cur:cur,ret:ret,bdays:age-cur};
+      $("cdOut").innerHTML='<p>Here\'s your runway, kiddo. You turn '+age+' on <b>'+ret.toLocaleDateString("en-CA",OPTS)+'</b>.</p><div class="out">'+box(y+" yrs, "+m+" mos, "+d+" days","to go")+box(String(age-cur),"birthdays left")+'</div>';}
+  }
+  var res=Math.round(num("res")),start=Math.max(2009,by+18,res||0),built=0;for(var yr=start;yr<=thisYear;yr++)built+=limitFor(yr);
+  var useCra=raw("craRoom")!=="";ROOM={start:start,built:built,useCra:useCra,now:useCra?num("craRoom"):built};
+  var h='<div class="out">'+box(money(Math.max(ROOM.now,0)),useCra?"your room (your CRA number)":"your TFSA room today (full room since "+start+")",(CD?brkOver(Math.max(ROOM.now,0),CD.bdays,"To use it up by "+CD.age):'')+brkLeft(Math.max(ROOM.now,0),"To use it all by December 31")) +
+    box(money(LIMIT_NOW),"new room every year (2026 limit)",brk(LIMIT_NOW))+'</div>';
+  if(start>thisYear&&!useCra)h='<div class="hint">Your room starts in '+start+'. Nothing to put in yet.</div>';
+  h+='<p class="note">Full room since 2009 is $109,000 in 2026 if you were 18 by then and lived in Canada the whole time. Your CRA number beats my guess. Unused room carries forward forever.</p>';
+  $("roomOut").innerHTML=h;
+}
+
+/* ---------- 2. per hitch ---------- */
+function hitchesPerYear(){var r=raw("rot");$("customOn").style.display=$("customOff").style.display=r==="custom"?"":"none";
+  if(r==="mf")return 52;var on=14,off=14;if(r==="7/7"){on=7;off=7;}else if(r==="10/4"){on=10;off=4;}else if(r==="4/4"){on=4;off=4;}else if(r==="custom"){on=Math.max(1,num("cOn"));off=Math.max(0,num("cOff"));}
+  return Math.floor(365/(on+off));}
+function growRows(start,add){
+  var rows=[{label:"Today",age:CD.cur,b:[start,start,start],t:0}],b=[start,start,start],prevT=0;
+  for(var a=CD.cur+1;a<=CD.age;a++){var d=addYears(CD.by,CD.bm,CD.bd,a),t=(d-today)/86400000/365.25;
+    b=b.map(function(x,j){return x*Math.pow(1+RATES[j]/100,t-prevT)+add;});prevT=t;rows.push({label:String(d.getFullYear()),age:a,b:b.slice(),t:t});}
+  return rows;}
+function hitch(){
+  var hpy=hitchesPerYear(),perYear=num("perHitch")*hpy+num("otAmt")*num("otShifts");
+  PLAN={hitches:hpy,perYear:perYear,effective:debtFirst()?0:perYear};
+  var h='<div class="out">'+box(String(hpy),"hitches a year")+box(money(perYear),"into your TFSA a year",brk(perYear))+'</div>';
+  if(debtFirst())h+='<div class="warn"><b>TFSA paused, debt first.</b> No TFSA right now, we gotta get some of this debt under control. The numbers below are for when you turn it back on.</div>';
+  if(perYear>LIMIT_NOW){
+    var r=ROOM?ROOM.now:0,yrs=0;while(r>=perYear&&yrs<100){r=r-perYear+LIMIT_NOW;yrs++;}
+    h+='<div class="warn">'+money(perYear)+' a year is more than the '+money(LIMIT_NOW)+' of new room you get each year. That works while you\'ve got unused room'+(ROOM&&ROOM.now>0?(yrs<1?', but at this pace you use up your room this year':', and at this pace your room runs out in about '+yrs+' year'+(yrs===1?'':'s')):'')+'. After that, the extra needs another account, like an RRSP.</div>';}
+  if(ROOM&&perYear>Math.max(ROOM.now,0))h+='<div class="warn">Whoa. That\'s more than the '+money(Math.max(ROOM.now,0))+' of room you\'ve got right now. Going over costs 1% a month on the extra until it\'s out.</div>';
+  if(!CD){$("hitchOut").innerHTML=h+'<div class="hint">Fill in your birthday up top and I\'ll grow it out to retirement.</div>';$("hitchChart").innerHTML=$("hitchTable").innerHTML="";return;}
+  var rows=growRows(num("tfsaNow"),perYear),cross=RATES.map(function(r,j){for(var i=0;i<rows.length;i++)if(rows[i].b[j]>=1e6)return i;return -1;});
+  var last=rows[rows.length-1];h+='<p>By your retirement birthday at '+CD.age+':</p><div class="out">';
+  RATES.forEach(function(r,j){h+=box(money(last.b[j]),"at "+r+"% a year");});h+='</div>';
+  h+='<div class="'+(cross.some(function(i){return i>=0;})?'good':'hint')+'">'+RATES.map(function(r,j){var i=cross[j];return i>=0?'At '+r+'% you cross $1,000,000 in '+rows[i].label+', at age '+rows[i].age+'.':'At '+r+'% you don\'t reach $1,000,000 by '+CD.age+'.';}).join('<br>')+'</div>';
+  $("hitchOut").innerHTML=h;
+  var t='<table><tr><th>Year</th><th>Age</th><th>4%</th><th>6%</th><th>8%</th></tr>';
+  rows.forEach(function(rw,i){t+='<tr'+(cross.indexOf(i)>=0?' class="hit"':'')+'><td>'+rw.label+'</td><td>'+rw.age+'</td>'+rw.b.map(function(x,j){return '<td>'+money(x)+(cross[j]===i?' ★':'')+'</td>';}).join('')+'</tr>';});
+  $("hitchTable").innerHTML=t+'</table>';
+  $("hitchChart").innerHTML=lineChart(rows.map(function(r){return {x:r.t,lbl:"Age "+r.age,v:r.b};}),["#2f6f8f","#b5541c","#3c8a4a"],true,cross);
+}
+function lineChart(pts,cols,million,marks){ // pts:[{x,lbl,v:[..]}]
+  var W=700,H=260,L=64,R=16,T=14,B=34,max=0;pts.forEach(function(p){p.v.forEach(function(x){max=Math.max(max,x);});});
+  if(max<=0||pts.length<2)return "";var mag=Math.pow(10,Math.floor(Math.log10(max))),nice=Math.ceil(max/mag)*mag,xs=pts[pts.length-1].x||1;
+  function X(x){return L+(W-L-R)*x/xs;}function Y(v){return T+(H-T-B)*(1-v/nice);}
+  var s='<svg viewBox="0 0 '+W+' '+H+'">';
+  for(var g=0;g<=4;g++){var y=Y(nice*g/4);s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y+'" y2="'+y+'" stroke="#e6e1d6"/><text x="'+(L-6)+'" y="'+(y+4)+'" text-anchor="end" font-size="12" fill="#777" font-family="Arial">'+short(nice*g/4)+'</text>';}
+  var n=pts.length,step=Math.max(1,Math.round((n-1)/5));pts.forEach(function(p,i){if(i===0||i===n-1||(i%step===0&&n-1-i>=step/2))s+='<text x="'+X(p.x)+'" y="'+(H-10)+'" text-anchor="middle" font-size="12" fill="#777" font-family="Arial">'+esc(p.lbl)+'</text>';});
+  if(million&&nice>=1e6)s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(1e6)+'" y2="'+Y(1e6)+'" stroke="#9a9a9a" stroke-dasharray="5 4"/>';
+  cols.forEach(function(c,j){s+='<path d="'+pts.map(function(p,i){return (i?"L":"M")+X(p.x).toFixed(1)+" "+Y(p.v[j]).toFixed(1);}).join(" ")+'" fill="none" stroke="'+c+'" stroke-width="2.5"/>';
+    if(marks&&marks[j]>=0){var p=pts[marks[j]];s+='<circle cx="'+X(p.x)+'" cy="'+Y(p.v[j])+'" r="5" fill="'+c+'"/>';}});
+  return s+'</svg>';
+}
+
+/* ---------- 3. other money ---------- */
+var OTHER=[["inherit","Have you received an inheritance?"],["bonus","A bonus or retention payment?"],["refund","A tax refund?"],["sold","Sold something (truck, sled, quad)?"],["settle","A settlement or severance?"],["gift","A gift?"],["oneoff","Any other one-off money?"]];
+function buildOther(){$("omList").innerHTML=OTHER.map(function(o){return '<div class="row" style="border-bottom:1px solid var(--line);padding-bottom:8px"><label style="flex:2 1 220px">'+o[1]+'<select data-om="'+o[0]+'" data-f="yn"><option value="">Pick one</option><option>No</option><option>Yes</option></select></label><label>Amount ($)<input type="number" data-om="'+o[0]+'" data-f="amt"></label><label>Month<input type="month" data-om="'+o[0]+'" data-f="month"></label></div>';}).join("");
+  document.querySelectorAll("[data-om]").forEach(function(e){var o=STATE.other[e.getAttribute("data-om")]||{};e.value=o[e.getAttribute("data-f")]||"";});}
+function otherList(){return OTHER.map(function(o){var x=STATE.other[o[0]]||{};return {id:o[0],q:o[1],yes:x.yn==="Yes",amt:parseFloat(x.amt)||0,month:x.month||""};}).filter(function(x){return x.yes&&x.amt>0;});}
+function otherMoney(){
+  var L=otherList(),yr=L.filter(function(x){return !x.month||x.month.slice(0,4)===String(thisYear);}),tot=yr.reduce(function(a,x){return a+x.amt;},0);
+  if(!L.length){$("omOut").innerHTML='<p class="note">Nothing extra landed? That\'s fine. Come back when it does, before it gets spent.</p>';return;}
+  var rr=remainingRoom(),hi=(STATE.debts||[]).filter(function(d){return (parseFloat(d.rate)||0)>=10&&(parseFloat(d.bal)||0)>0;});
+  var h='<div class="out">'+box(money(tot),"one-off money this year")+box(money(rr),"TFSA room left this year",(CD?brkOver(rr,CD.bdays,"To use it up by "+CD.age):"")+brkLeft(rr,"To fill it by December 31"))+'</div><ul>';
+  if(hi.length)h+='<li>Put a good chunk on the '+esc(hi[0].name||hi[0].type||"high-interest debt")+' at '+esc(hi[0].rate)+'% first. That\'s a guaranteed return.</li>';
+  if(debtFirst())h+='<li>TFSA paused, debt first. Send it at the debt plan below.</li>';
+  else h+='<li>Then put some into your TFSA, up to the '+money(rr)+' of room you\'ve got left.</li>';
+  h+='<li>Keep a little for the emergency fund. Spend some on something fun, but decide the split before it hits the account.</li></ul>';
+  if(!debtFirst()&&tot>rr)h+='<div class="warn">That\'s more than your TFSA room left this year. Don\'t dump it all in: going over costs 1% a month on the extra. Park the rest until January 1 or use another account.</div>';
+  $("omOut").innerHTML=h;
+}
+
+/* ---------- 4. pay stub + stacking fund ---------- */
+function taxOn(base,amt){var t=0;for(var i=0;i<BRACKETS.length;i++){var lo=BRACKETS[i][0],hi=i+1<BRACKETS.length?BRACKETS[i+1][0]:Infinity,a=Math.max(base,lo),b=Math.min(base+amt,hi);if(b>a)t+=(b-a)*BRACKETS[i][1];}return t;}
+function marginal(x){var r=BRACKETS[0][1];BRACKETS.forEach(function(b){if(x>=b[0])r=b[1];});return r;}
+function estIncome(){if(raw("stIncome")!=="")return {v:num("stIncome"),est:false};var y=num("stYtdGross");if(y>0){var doy=Math.max(1,Math.round((today-new Date(thisYear,0,1))/86400000)+1);return {v:y/doy*365,est:true};}return {v:0,est:true};}
+function shiftCalc(n){
+  var gross=num("stRate")*parseFloat(raw("stMult")||"1.5")*num("stHours"),inc=estIncome().v,ytdG=num("stYtdGross"),cpp=num("stYtdCpp"),ei=num("stYtdEi"),cpp2=Math.max(0,Math.min(85000,ytdG)-74600)*CPP2_RATE,res=[];
+  for(var k=0;k<n;k++){var tax=taxOn(inc+k*gross,gross);
+    var c1=Math.max(0,Math.min(gross*CPP_RATE,CPP_MAX-cpp));cpp+=c1;
+    var c2=0,g0=ytdG+k*gross,lo=Math.max(g0,74600),hi=Math.min(g0+gross,85000);if(hi>lo)c2=Math.min((hi-lo)*CPP2_RATE,Math.max(0,CPP2_MAX-cpp2));cpp2+=c2;
+    var e=Math.max(0,Math.min(gross*EI_RATE,EI_MAX-ei));ei+=e;
+    res.push({gross:gross,tax:tax,cpp:c1+c2,ei:e,net:gross-tax-c1-c2-e});}
+  return {gross:gross,rows:res};
+}
+var shN=0;
+function stub(){
+  $("shN").textContent=shN;var inc=estIncome(),one=shiftCalc(1).rows[0],all=shiftCalc(shN).rows;
+  STUB={perShift:one?one.net:0,total:all.reduce(function(a,r){return a+r.net;},0),n:shN};
+  var h='';
+  if(!(num("stRate")>0)){$("stubOut").innerHTML='<div class="hint">Put in your hourly rate (or snap the stub) and I\'ll work out what an extra shift really pays.</div>';stack();return;}
+  h+='<p>One extra shift: '+money(one.gross,true)+' gross at '+raw("stMult")+'x for '+num("stHours")+' hours. Yearly income used: '+money(inc.v)+(inc.est?' (estimate from year-to-date)':'')+', so your top tax rate is about '+(marginal(inc.v)*100).toFixed(1)+'% (federal plus Alberta).</p>';
+  h+='<table><tr><th>Per extra shift (first one)</th><th>Estimate</th></tr><tr><td>Gross</td><td>'+m2(one.gross)+'</td></tr><tr><td>Income tax, federal + Alberta</td><td>-'+m2(one.tax)+'</td></tr><tr><td>CPP'+(one.cpp===0?' (maxed out this year)':'')+'</td><td>-'+m2(one.cpp)+'</td></tr><tr><td>EI'+(one.ei===0?' (maxed out this year)':'')+'</td><td>-'+m2(one.ei)+'</td></tr><tr><td><b>Take-home</b></td><td><b>'+m2(one.net)+'</b></td></tr></table>';
+  h+='<div class="out">'+box(String(shN),"extra shifts this month")+box(m2(STUB.total),"take-home from them")+'</div>';
+  $("stubOut").innerHTML=h;stack();
+}
+function otShare(){var r=document.querySelector('input[name=otRoute]:checked');r=r?r.value:"tfsa";if(debtFirst())return {debt:1,tfsa:0,route:"debt"};return r==="debt"?{debt:1,tfsa:0,route:r}:r==="split"?{debt:.5,tfsa:.5,route:r}:{debt:0,tfsa:1,route:r};}
+function stack(){
+  var s=STATE.stack,rr=remainingRoom(),ready=Math.min(s.fund,rr),sh=otShare(),addAmt=(STUB?STUB.total:0)*sh.tfsa;
+  var h='<div class="out">'+box('<span class="counter">'+m2(s.fund)+'</span>',"in your Stacking fund")+box(money(movedThisYear()),"moved to your TFSA this year")+box(money(rr),"TFSA room left",(CD?brkOver(rr,CD.bdays,"To use it up by "+CD.age):"")+brkLeft(rr,"To fill it by December 31"))+'</div>';
+  if(debtFirst())h+='<div class="warn">TFSA paused, debt first. Extra-shift money goes to the debt plan right now.</div>';
+  else if(sh.route!=="tfsa")h+='<p class="note">Extra shifts are set to '+(sh.route==="debt"?"go to debt":"split 50-50")+', so '+m2(addAmt)+' of this month\'s '+m2(STUB?STUB.total:0)+' comes here.</p>';
+  if(s.fund>rr)h+='<div class="warn">Your fund is bigger than your room left this year. Only '+m2(ready)+' can go in now. The rest waits for January 1, or going over costs 1% a month.</div>';
+  else if(s.fund>0&&!debtFirst())h+='<div class="good">'+m2(ready)+' is ready to go into your TFSA.</div>';
+  $("stackOut").innerHTML=h;$("stackAdd").textContent="Add this month's extra-shift money ("+m2(addAmt)+")";
+  $("stackAdd").disabled=!(addAmt>0);$("stackMoveAll").disabled=$("stackMoveSome").disabled=debtFirst()||!(s.fund>0)||rr<=0;
+}
+function moveToTfsa(amt){var s=STATE.stack,rr=remainingRoom();amt=Math.min(amt,s.fund,rr);if(!(amt>0))return;s.fund=Math.round((s.fund-amt)*100)/100;s.moved.push({y:thisYear,amt:amt,d:ymKey(today)});saveState();all();}
+function parseStub(text){
+  var L=text.split(/\n/),f=function(re){for(var i=0;i<L.length;i++)if(re.test(L[i])){var a=amountsIn(L[i]);if(a.length)return a;}return null;};
+  var set=function(id,v){if(v!=null&&isFinite(v)&&raw(id)===""){$(id).value=v;STATE.inputs[id]=String(v);}};
+  var regLine=L.filter(function(l){return /regular|reg\.?\s|base|straight/i.test(l)&&amountsIn(l).length;})[0];
+  if(regLine){var after=regLine.match(/(?:hrs|hours|h)\b\.?\s*\$?\s?(\d+\.\d{2})/i),reg=amountsIn(regLine),rate=null;
+    if(after&&+after[1]>=15&&+after[1]<=250)rate=+after[1];
+    else{for(var i=0;i<reg.length-2&&rate===null;i++)if(Math.abs(reg[i]*reg[i+1]-reg[i+2])<1)rate=reg[i+1];}
+    if(rate===null){var r=reg.filter(function(x){return x>=15&&x<=250;});if(r.length)rate=r[0];}
+    if(rate!==null)set("stRate",rate);}
+  var g=f(/gross/i);if(g){set("stGross",g[0]);if(g.length>1)set("stYtdGross",g[g.length-1]);}
+  var c=f(/\bcpp\b|canada pension/i);if(c&&c.length>1)set("stYtdCpp",c[c.length-1]);
+  var e=f(/\b(?:ei|e1|el)\b|employment ins/i);if(e&&e.length>1)set("stYtdEi",e[e.length-1]);
+  if(/double\s*time|2\.0x|dt\b/i.test(text)&&!/1\.5/.test(text)){$("stMult").value="2";}
+}
+
+/* ---------- 5. debt payoff plan ---------- */
+var DTYPES=["Truck or vehicle loan","Mortgage or rent","Utility","Phone","Credit card","Line of credit","Payday loan","CRA or taxes","Other"];
+var PRIO={"Mortgage or rent":1,"Truck or vehicle loan":1,"Utility":1,"CRA or taxes":2,"Payday loan":3};
+var WHY={"Truck or vehicle loan":"repossession risk","Mortgage or rent":"you could lose the roof over your head","Utility":"they can cut your power or heat","Phone":"they can cut you off","CRA or taxes":"CRA can take it straight off your pay","Payday loan":"collections risk and brutal interest","Credit card":"late fees, a penalty rate and credit damage","Line of credit":"late fees and credit damage","Other":"late fees and credit damage"};
+function prefillDebts(){
+  if(STATE.debts&&STATE.debts.length)return;
+  try{var p=JSON.parse(localStorage.getItem("crudeDudeMoneyLife.v1")||"null");if(p&&p.debts&&p.debts.length){
+    var map={"Truck or vehicle loan/lease":"Truck or vehicle loan","Mortgage":"Mortgage or rent","Payday loan":"Payday loan","CRA balance":"CRA or taxes","Credit card":"Credit card","Line of credit":"Line of credit"};
+    STATE.debts=p.debts.map(function(d){return {name:d.lender||d.type||"",type:map[d.type]||"Other",bal:d.bal||"",rate:d.rate||"",min:d.min||"",missed:false,nMissed:"",pastDue:""};});}}catch(e){}
+}
+function renderDebtRows(){
+  $("dbRows").innerHTML=(STATE.debts||[]).map(function(d,i){
+    var o='<option value="">Pick one</option>'+DTYPES.map(function(t){return '<option'+(d.type===t?' selected':'')+'>'+t+'</option>';}).join("");
+    return '<div class="bill" style="margin:8px 0"><div class="row"><label>What is it<input data-db="'+i+'" data-f="name" value="'+esc(d.name)+'" placeholder="e.g. Visa"></label><label>Type<select data-db="'+i+'" data-f="type">'+o+'</select></label></div>'+
+      '<div class="row"><label>Balance ($)<input type="number" data-db="'+i+'" data-f="bal" value="'+esc(d.bal)+'"></label><label>Interest rate (%)<input type="number" step="0.01" data-db="'+i+'" data-f="rate" value="'+esc(d.rate)+'"></label><label>Minimum per month ($)<input type="number" data-db="'+i+'" data-f="min" value="'+esc(d.min)+'"></label></div>'+
+      '<div class="row"><label class="inline"><input type="checkbox" data-db="'+i+'" data-f="missed"'+(d.missed?' checked':'')+'>Missed or behind</label><label># of payments missed<input type="number" data-db="'+i+'" data-f="nMissed" value="'+esc(d.nMissed)+'"></label><label>Amount past due ($)<input type="number" data-db="'+i+'" data-f="pastDue" value="'+esc(d.pastDue)+'" placeholder="blank = missed x minimum"></label></div>'+
+      '<button data-dbrm="'+i+'">Remove this one</button></div>';}).join("");
+}
+function debtList(){return (STATE.debts||[]).map(function(d,i){var bal=parseFloat(d.bal)||0,min=parseFloat(d.min)||0,nm=parseFloat(d.nMissed)||0,pd=d.missed?(d.pastDue!==""&&d.pastDue!=null?parseFloat(d.pastDue)||0:nm*min):0;
+  return {i:i,name:d.name||d.type||("Debt "+(i+1)),type:d.type||"Other",bal:bal,rate:parseFloat(d.rate)||0,min:min,missed:!!d.missed,nMissed:nm,pastDue:Math.min(pd,bal)};}).filter(function(d){return d.bal>0;});}
+function catchUpOrder(L){return L.filter(function(d){return d.missed;}).sort(function(a,b){return (PRIO[a.type]||4)-(PRIO[b.type]||4)||b.pastDue-a.pastDue;});}
+function strategyOrder(L,kind){return L.slice().sort(kind==="snow"?function(a,b){return a.bal-b.bal||b.rate-a.rate;}:function(a,b){return b.rate-a.rate||a.bal-b.bal;});}
+function simulate(L,order,extra,mode){ // mode: "plan" (rollover + catch-up) or "min" (minimums only)
+  var n=L.length,bal=L.map(function(d){return d.bal;}),pd=L.map(function(d){return d.pastDue;}),idx={};L.forEach(function(d,k){idx[d.i]=k;});
+  var cu=catchUpOrder(L).map(function(d){return idx[d.i];}),ord=order.map(function(d){return idx[d.i];});
+  var interest=0,series=[bal.reduce(function(a,b){return a+b;},0)],paid=[],catchMonth=pd.some(function(x){return x>0;})?null:0,m=0;
+  while(m<600&&bal.some(function(b){return b>0.005;})){
+    m++;var pool=mode==="plan"?extra:0;
+    for(var k=0;k<n;k++){if(bal[k]<=0.005){if(mode==="plan")pool+=L[k].min;continue;}var it=bal[k]*L[k].rate/1200;interest+=it;bal[k]+=it;var p=Math.min(bal[k],L[k].min);bal[k]-=p;if(mode==="plan")pool+=L[k].min-p;}
+    if(mode==="plan"){
+      cu.forEach(function(k){if(pool<=0||pd[k]<=0||bal[k]<=0)return;var p=Math.min(pool,pd[k],bal[k]);pd[k]-=p;bal[k]-=p;pool-=p;});
+      if(catchMonth===null&&pd.every(function(x,k){return x<=0.005||bal[k]<=0.005;}))catchMonth=m;
+      ord.forEach(function(k){if(pool<=0||bal[k]<=0.005)return;var p=Math.min(pool,bal[k]);bal[k]-=p;pool-=p;});
+    }
+    for(k=0;k<n;k++)if(bal[k]<=0.005&&!paid.some(function(x){return x.k===k;})){bal[k]=0;paid.push({k:k,m:m,name:L[k].name});}
+    series.push(bal.reduce(function(a,b){return a+Math.max(b,0);},0));
+  }
+  var done=!bal.some(function(b){return b>0.005;});
+  return {months:done?m:Infinity,interest:interest,series:series,paid:paid,catchMonth:catchMonth};
+}
+function mLabel(m){return ymLabel(ymShift(ymKey(today),m));}
+function debtExtraMonthly(){var per=raw("dbExtraPer")==="payday"?26/12:52/12;return num("dbExtra")*per+(STUB?STUB.total:0)*otShare().debt;}
+function debtPlan(){
+  var L=debtList(),hi=L.filter(function(d){return d.rate>10;}),ef=raw("efMonths");
+  $("dbSuggest").innerHTML=(!debtFirst()&&hi.length&&ef!==""&&num("efMonths")<1)?'<div class="warn">You\'ve got debt over 10% and less than a month of cushion. Grandpa says: switch on Debt first mode. <button id="dbSwitch">Switch on Debt first mode</button></div>':(debtFirst()?'<div class="warn"><b>Debt first mode is on.</b> No TFSA right now, we gotta get some of this debt under control.</div>':'');
+  if(!L.length){$("dbOut").innerHTML='<p class="note">Add your debts above and grandpa will draw up the plan.</p>';$("dbChart").innerHTML="";DEBT=null;return;}
+  var extra=debtExtraMonthly(),h='';
+  h+='<div class="out">'+box(money(L.reduce(function(a,d){return a+d.bal;},0)),"total owed")+box(money(L.reduce(function(a,d){return a+d.min;},0)),"minimums a month")+box(m2(extra),"extra a month toward debt",brk(extra*12))+'</div>';
+  var bad=L.filter(function(d){return d.min<=d.bal*d.rate/1200;});
+  if(bad.length)h+='<div class="warn">The minimum on '+bad.map(function(d){return esc(d.name);}).join(", ")+' doesn\'t even cover the interest. On minimums alone that never gets paid off.</div>';
+  var cu=catchUpOrder(L);
+  if(cu.length||raw("dbMissed")==="Yes"||/little|lot/i.test(raw("dbBehind"))){
+    h+='<h3>Step 1: Catch up</h3>';
+    if(cu.length)h+='<ol>'+cu.map(function(d){return '<li><b>'+esc(d.name)+'</b>: '+m2(d.pastDue)+' past due. Behind '+(d.nMissed||"some")+' payment'+(d.nMissed===1?'':'s')+': '+WHY[d.type]+'.</li>';}).join("")+'</ol>';
+    else h+='<p class="note">Tick "Missed or behind" on the debts you\'re behind on so grandpa can put them first.</p>';
+    h+='<ul><li>Call the lender before they call you, and ask about a payment arrangement.</li><li>Free non-profit credit counselling is out there in Canada, like the member agencies of Credit Counselling Canada. Worth a call; no promises, but they\'ve seen it all.</li><li>Missed payments hurt your credit report. Catching up stops the bleeding.</li></ul>';
+  }
+  var snow=simulate(L,strategyOrder(L,"snow"),extra,"plan"),aval=simulate(L,strategyOrder(L,"aval"),extra,"plan"),mins=simulate(L,L,0,"min");
+  function fmtM(s){return s.months===Infinity?"Never (50+ years)":mLabel(s.months)+" ("+s.months+" months)";}
+  function saved(s){return mins.months===Infinity?(s.months===Infinity?"-":"all of it, minimums never finish"):(s.months===Infinity?"-":(mins.months-s.months)+" months");}
+  h+='<h3>'+(cu.length?'Step 2: ':'')+'Pay it off</h3><table><tr><th></th><th>Snowball (smallest first)</th><th>Avalanche (highest rate first)</th><th>Minimums only</th></tr>'+
+    '<tr><td>Debt-free</td><td>'+fmtM(snow)+'</td><td>'+fmtM(aval)+'</td><td>'+fmtM(mins)+'</td></tr>'+
+    '<tr><td>Total interest</td><td>'+money(snow.interest)+'</td><td>'+money(aval.interest)+'</td><td>'+(mins.months===Infinity?'keeps growing':money(mins.interest))+'</td></tr>'+
+    '<tr><td>Months saved vs minimums</td><td>'+saved(snow)+'</td><td>'+saved(aval)+'</td><td></td></tr>'+
+    (cu.length?'<tr><td>Caught up by</td><td>'+(snow.catchMonth?mLabel(snow.catchMonth):'-')+'</td><td>'+(aval.catchMonth?mLabel(aval.catchMonth):'-')+'</td><td></td></tr>':'')+'</table>';
+  h+='<p class="note">Snowball order: '+strategyOrder(L,"snow").map(function(d){return esc(d.name);}).join(" → ")+'. Avalanche order: '+strategyOrder(L,"aval").map(function(d){return esc(d.name);}).join(" → ")+'. When one is paid off, its minimum rolls into the next.</p>';
+  var best=aval.interest<=snow.interest?aval:snow,bestName=best===aval?"avalanche":"snowball";
+  h+='<p>Grandpa\'s pick: <b>'+bestName+'</b>'+(Math.abs(aval.interest-snow.interest)<1?' (same result here, both go in the same order)':', it saves '+money(Math.abs(aval.interest-snow.interest))+' in interest')+'. Snowball feels better; avalanche costs less. Either beats doing nothing.</p>';
+  best.paid.forEach(function(p){h+='<div style="border:3px solid var(--ok);color:var(--ok);font:800 20px Arial,Helvetica,sans-serif;letter-spacing:2px;padding:8px 12px;margin:8px 0;display:inline-block;transform:rotate(-1.5deg)">DEBT ELIMINATED: '+esc(p.name)+' · '+mLabel(p.m)+'</div><br>';});
+  if(best.months!==Infinity)h+='<div style="border:4px solid var(--ok);background:#edf5ec;color:var(--ok);font:900 26px Arial,Helvetica,sans-serif;letter-spacing:3px;text-align:center;padding:12px;margin:10px 0">DEBT ELIMINATED · '+mLabel(best.months)+'</div>';
+  var hiIdx=hi.map(function(d){return d.name;}),hiPaid=best.paid.filter(function(p){return hiIdx.indexOf(p.name)>=0;}),hiDone=hi.length&&hiPaid.length===hi.length?Math.max.apply(null,hiPaid.map(function(p){return p.m;})):null;
+  if(hiDone!==null)h+='<div class="good"><b>Time to turn the TFSA back on'+(hiDone?' in '+mLabel(hiDone):'')+'.</b> The high-interest stuff is gone by then. '+(debtFirst()?'Switch Debt first mode off then and point':'From then on, point')+' that freed-up money at your TFSA.</div>';
+  else if(!hi.length&&debtFirst())h+='<div class="good"><b>Time to turn the TFSA back on.</b> No debt over 10% left.</div>';
+  $("dbOut").innerHTML=h;DEBT={snow:snow,aval:aval,mins:mins,best:best,extra:extra};
+  var maxM=Math.min(600,Math.max(snow.series.length,aval.series.length,Math.min(mins.series.length,Math.max(snow.series.length,aval.series.length)*2)));
+  var pts=[];for(var m=0;m<maxM;m+=Math.max(1,Math.round(maxM/120))){pts.push({x:m,lbl:mLabel(m),v:[snow.series[m]||0,aval.series[m]||0,mins.series[Math.min(m,mins.series.length-1)]]});}
+  pts.push({x:maxM,lbl:mLabel(maxM),v:[snow.series[maxM]||0,aval.series[maxM]||0,mins.series[Math.min(maxM,mins.series.length-1)]]});
+  var svg=lineChart(pts,["#2f6f8f","#b5541c","#9a9a9a"],false);
+  if(svg&&best.months!==Infinity){var W=700,L0=64,R=16,xs=maxM||1,x=L0+(W-L0-R)*best.months/xs;svg=svg.replace('</svg>','<line x1="'+x+'" x2="'+x+'" y1="14" y2="226" stroke="#2e6b2e" stroke-dasharray="3 3"/><text x="'+Math.min(x,W-110)+'" y="28" font-size="12" font-weight="700" fill="#2e6b2e" font-family="Arial">DEBT ELIMINATED</text></svg>');}
+  $("dbChart").innerHTML='<div class="legend"><span><i class="sw" style="background:#2f6f8f"></i>Snowball</span><span><i class="sw" style="background:#b5541c"></i>Avalanche</span><span><i class="sw" style="background:#9a9a9a"></i>Minimums only</span></div>'+svg;
+}
+
+/* ---------- 6. monthly bills ---------- */
+var STD_BILLS=["Power","Cable/Internet","Phone","Rent/Mortgage"];
+function curYm(){return raw("billMonth")||ymKey(today);}
+function billsFor(ym,create){if(!STATE.bills[ym]&&create){STATE.bills[ym]=STD_BILLS.map(function(n,i){return {id:"s"+i,name:n,amt:"",photo:false,std:true};});}return STATE.bills[ym]||[];}
+function billAmt(ym,name){var b=(STATE.bills[ym]||[]).filter(function(x){return x.name===name&&parseFloat(x.amt)>0;})[0];return b?parseFloat(b.amt):null;}
+function billTotal(ym){return (STATE.bills[ym]||[]).reduce(function(a,b){return a+(parseFloat(b.amt)||0);},0);}
+function renderBills(){
+  var ym=curYm(),L=billsFor(ym,true);
+  $("billGrid").innerHTML=L.map(function(b){
+    var a=parseFloat(b.amt)||0,last=billAmt(ymShift(ym,-1),b.name),prev=[1,2,3].map(function(k){return billAmt(ymShift(ym,-k),b.name);}).filter(function(x){return x!==null;}),avg=prev.length?prev.reduce(function(s,x){return s+x;},0)/prev.length:null;
+    var creep=a>0&&((avg!==null&&a>avg*1.1)||(avg===null&&last!==null&&a>last*1.1));
+    var meta=[];if(a>0&&last!==null)meta.push((a>=last?"Up ":"Down ")+m2(Math.abs(a-last))+" from last month");if(a>0&&avg!==null)meta.push((a>=avg?"Up ":"Down ")+(Math.abs(a-avg)/avg*100).toFixed(0)+"% vs your 3-month average ("+m2(avg)+")");
+    return '<div class="bill"><label class="bigbtn" style="width:100%" for="bf_'+b.id+'">'+(b.photo?'Retake: ':'Snap: ')+esc(b.name)+'</label><input type="file" id="bf_'+b.id+'" data-billphoto="'+b.id+'" accept="image/*" capture="environment">'+
+      '<div id="th_'+b.id+'"></div><label>Amount ($)<input type="number" step="0.01" data-bill="'+b.id+'" value="'+esc(b.amt)+'"></label>'+
+      (b.sug?'<div class="meta">Read off the photo. Check it.</div>':'')+(creep?'<div class="creep">Creeping up</div>':'')+(meta.length?'<div class="meta">'+meta.join('<br>')+'</div>':'')+
+      '<div class="btns" style="margin-top:6px">'+(b.photo?'<button data-billdelphoto="'+b.id+'">Delete photo</button>':'')+'<button data-billdel="'+b.id+'">'+(b.std?'Clear':'Delete bill')+'</button></div></div>';}).join("");
+  L.forEach(function(b){if(b.photo)idbGet("bill|"+ym+"|"+b.id).then(function(blob){var t=$("th_"+b.id);if(blob&&t){t.innerHTML='<img alt="'+esc(b.name)+' bill photo" src="'+URL.createObjectURL(blob)+'">';}}).catch(function(){});});
+}
+function payMonthly(){if(raw("payMonth")!=="")return num("payMonth");if(raw("payHitch")!=="")return num("payHitch")*(PLAN?PLAN.hitches:13)/12;return 0;}
+function assess(){
+  var ym=curYm(),bills=billTotal(ym),sp=spendFor(ym),spTot=Object.keys(sp).filter(function(c){return c!=="Bills/utilities"&&c!=="Transfers";}).reduce(function(a,c){return a+sp[c];},0);
+  var debts=raw("debtsMo")!==""&&num("debtsMo")>0?num("debtsMo"):debtList().reduce(function(a,d){return a+d.min;},0);
+  var pay=payMonthly(),left=pay-bills-spTot-debts,target=PLAN&&!debtFirst()?PLAN.perYear/12:0;
+  var h='<div class="out">'+box(m2(bills),"bills in "+ymLabel(ym))+box(m2(spTot),"other spending you snapped")+box(m2(debts),"debt payments")+box(m2(left),"left over")+'</div>';
+  h+='<p>'+(debtFirst()?'TFSA target: <b>TFSA paused, debt first.</b>':'Your TFSA plan needs '+m2(target)+' a month.')+'</p>'+(target?brk(target*12):'');
+  var v,steps=[];
+  if(!(pay>0)){h+='<div class="hint">Put in your take-home pay above and grandpa will give you a verdict.</div>';}
+  else{
+    if(left<0){v="Getting out of hand";steps.push("You're spending "+m2(-left)+" more than comes in. Pick the biggest bill or category and cut it this month.");}
+    else if(debtFirst()){var dx=num("dbExtra")*(raw("dbExtraPer")==="payday"?26:52)/12;
+      if(left<dx){v="Tight";steps.push("You've got "+m2(left)+" left but your debt plan wants "+m2(dx)+" extra a month. Trim one habit or route overtime to debt.");}
+      else{v="On track";steps.push(dx>0?"Send the "+m2(dx)+" extra to your debt on payday, before you see it.":"Pick an extra amount for your debt plan and send it on payday.");}}
+    else if(left<target){v="Tight";steps.push("You've got "+m2(left)+" left but the plan needs "+m2(target)+". Trim one habit or route overtime to the TFSA.");}
+    else{v="On track";steps.push("Move the "+m2(target)+" to your TFSA on payday, before you see it.");}
+    var creeping=(STATE.bills[ym]||[]).filter(function(b){var a=parseFloat(b.amt)||0,prev=[1,2,3].map(function(k){return billAmt(ymShift(ym,-k),b.name);}).filter(function(x){return x!==null;});if(!prev.length||!a)return false;var avg=prev.reduce(function(s,x){return s+x;},0)/prev.length;return a>avg*1.1;});
+    if(creeping.length)steps.push(creeping.map(function(b){return b.name;}).join(" and ")+" "+(creeping.length>1?"are":"is")+" creeping up. Call and ask for a better rate.");
+    var om=otherList().filter(function(x){return x.month===ym;});if(om.length)steps.push("You had "+money(om.reduce(function(a,x){return a+x.amt;},0))+" of one-off money this month. Not regular pay; put some toward TFSA room or debt.");
+    h+='<div class="verdict" style="color:'+(v==="On track"?'var(--ok)':v==="Tight"?'#8a5a00':'var(--warn)')+'">'+v+'</div><ul>'+steps.slice(0,3).map(function(s){return '<li>'+esc(s)+'</li>';}).join("")+'</ul>';
+  }
+  $("assessOut").innerHTML=h;
+  var months=Object.keys(STATE.bills).filter(function(k){return billTotal(k)>0;}).sort().slice(-12);
+  if(months.length){var W=700,H=200,max=Math.max.apply(null,months.map(billTotal)),bw=Math.min(60,(W-40)/months.length-10),s='<svg viewBox="0 0 '+W+' '+H+'">';
+    months.forEach(function(k,i){var t=billTotal(k),bh=(H-50)*t/max,x=20+i*((W-40)/months.length)+5;s+='<rect x="'+x+'" y="'+(H-28-bh)+'" width="'+bw+'" height="'+bh+'" fill="'+(k===ym?'#b5541c':'#d9b9a2')+'" rx="3"/><text x="'+(x+bw/2)+'" y="'+(H-12)+'" text-anchor="middle" font-size="11" fill="#777" font-family="Arial">'+ymLabel(k)+'</text><text x="'+(x+bw/2)+'" y="'+(H-32-bh)+'" text-anchor="middle" font-size="11" fill="#333" font-family="Arial">'+short(t)+'</text>';});
+    $("billChart").innerHTML='<h3>Bill totals by month</h3>'+s+'</svg>';}else $("billChart").innerHTML="";
+}
+
+/* ---------- 7. snap spending ---------- */
+var CATS=["Fuel","Groceries","Meals out","Booze & smokes","Subscriptions","Truck","Shopping","Bills/utilities","Transfers","Other"];
+var RULES=[
+ ["Transfers",/e-?transfer|interac|transfer to|transfer from|atm|withdrawal/i],
+ ["Fuel",/petro[- ]?can|\bshell\b|\besso\b|husky|co-?op gas|\bmobil\b|chevron|fas ?gas|ultramar|pioneer|gas bar/i],
+ ["Meals out",/tim hortons|\btims\b|mcdonald|\ba ?& ?w\b|boston pizza|starbucks|doordash|skip ?the ?dishes|uber ?eats|subway|wendy|dairy queen|pizza|restaurant|grill|pub\b/i],
+ ["Groceries",/sobeys|safeway|walmart|superstore|save-?on|no ?frills|costco|freshco|real canadian|grocery|iga\b/i],
+ ["Booze & smokes",/liquor|wine and beyond|alcanna|cannabis|vape|tobacco|smoke|beer/i],
+ ["Subscriptions",/netflix|spotify|disney|prime|apple\.com|itunes|google|xbox|playstation|crave|youtube|patreon/i],
+ ["Truck",/canadian tire|kal tire|ok tire|ford|chevrolet|\bgmc\b|\bram\b|dodge|toyota|dealership|auto parts|napa|lordco|parts|insurance|car wash|tire/i],
+ ["Shopping",/amazon|marks|mark's|winners|best buy|home depot|old navy|sport chek|dollarama|ebay|temu|shein/i],
+ ["Bills/utilities",/atco|epcor|enmax|direct energy|telus|rogers|bell\b|shaw|koodo|fido|freedom|utilit|power|water|rent|mortgage|rmwb/i]];
+function mKey(s){return String(s||"").toUpperCase().replace(/[#*0-9]+/g," ").replace(/[^A-Z&' ]/g," ").replace(/\s+/g," ").trim().split(" ").slice(0,3).join(" ");}
+function categorize(merchant){var k=mKey(merchant);if(STATE.cats[k])return STATE.cats[k];for(var i=0;i<RULES.length;i++)if(RULES[i][1].test(merchant))return RULES[i][0];return "Other";}
+var MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+var DATE_RE=/^(\d{4}-\d{2}-\d{2}|\d{1,2}\/\d{1,2}(?:\/\d{2,4})?|[A-Za-z]{3}\.? ?\d{1,2}(?:,? \d{4})?|\d{1,2} [A-Za-z]{3}(?: \d{4})?)\b/;
+function parseDate(s,yearHint){s=s.trim();var m;
+  if((m=s.match(/^(\d{4})-(\d{2})-(\d{2})/)))return m[1]+"-"+m[2]+"-"+m[3];
+  if((m=s.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/))){var y=m[3]?(m[3].length===2?"20"+m[3]:m[3]):yearHint;return y+"-"+String(m[1]).padStart(2,"0")+"-"+String(m[2]).padStart(2,"0");}
+  if((m=s.match(/^([A-Za-z]{3})\.? ?(\d{1,2})(?:,? (\d{4}))?/))&&MON[m[1].toLowerCase()])return (m[3]||yearHint)+"-"+String(MON[m[1].toLowerCase()]).padStart(2,"0")+"-"+String(m[2]).padStart(2,"0");
+  if((m=s.match(/^(\d{1,2}) ([A-Za-z]{3})(?: (\d{4}))?/))&&MON[m[2].toLowerCase()])return (m[3]||yearHint)+"-"+String(MON[m[2].toLowerCase()]).padStart(2,"0")+"-"+String(m[1]).padStart(2,"0");
+  return null;}
+function findDate(text,yh){var L=text.split(/\n/);for(var i=0;i<L.length;i++){var w=L[i].match(/(\d{4}-\d{2}-\d{2}|\d{1,2}\/\d{1,2}\/\d{2,4}|[A-Za-z]{3}\.? \d{1,2},? \d{4})/);if(w){var d=parseDate(w[1],yh);if(d)return d;}}return null;}
+function parseReceipt(text){var yh=curYm().slice(0,4),L=text.split(/\n/).map(function(s){return s.trim();}).filter(Boolean);
+  var merchant=(L.filter(function(l){return /[A-Za-z]{3}/.test(l)&&!/receipt|invoice|welcome|thank|store #|tel|phone|www|http/i.test(l);})[0]||"Receipt").replace(/\s{2,}/g," ").slice(0,40);
+  var amt=null;L.forEach(function(l){if(/total/i.test(l)&&!/sub\s*-?\s*total/i.test(l)){var a=amountsIn(l);if(a.length)amt=Math.max(amt||0,Math.max.apply(null,a));}});
+  if(amt===null){var all=[];L.forEach(function(l){all=all.concat(amountsIn(l));});if(all.length)amt=Math.max.apply(null,all);}
+  if(amt===null)return [];return [{date:findDate(text,yh)||(curYm()+"-01"),merchant:merchant,amt:amt,kind:"spend"}];}
+function parseStatement(lines){var yh=curYm().slice(0,4),out=[];
+  lines.forEach(function(l){var m=l.match(DATE_RE);if(!m)return;var rest=l.slice(m[0].length).trim(),m2d=rest.match(DATE_RE);if(m2d)rest=rest.slice(m2d[0].length).trim();
+    var am=rest.match(/(-?)\$?\s?(\d{1,3}(?:,\d{3})+|\d+)\.(\d{2})\s*(CR|-)?(?:\s+(\d{1,3}(?:,\d{3})*|\d+)\.\d{2})?\s*$/);if(!am)return;
+    var amt=parseFloat(am[2].replace(/,/g,"")+"."+am[3]),desc=rest.slice(0,am.index).trim();if(!desc||!/[A-Za-z]/.test(desc))return;
+    var credit=am[1]==="-"||!!am[4]||/payment|thank you|credit|refund|deposit|payroll|pay ?cheque|e-?transfer (received|from)|interest earned|rebate/i.test(desc);
+    out.push({date:parseDate(m[0],yh)||(curYm()+"-01"),merchant:desc.slice(0,40),amt:amt,kind:credit?"credit":"spend"});});
+  return out;}
+function addTxns(list,src){list.forEach(function(t){t.id="t"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);t.ym=t.date.slice(0,7);t.cat=t.kind==="credit"?"Transfers":categorize(t.merchant);t.src=src;STATE.spend.push(t);});saveState();}
+function spendFor(ym){var o={};(STATE.spend||[]).forEach(function(t){if(t.ym===ym&&t.kind==="spend")o[t.cat]=(o[t.cat]||0)+t.amt;});return o;}
+function renderSpend(){
+  var ym=curYm(),sp=spendFor(ym),cats=Object.keys(sp).sort(function(a,b){return sp[b]-sp[a];}),T=(STATE.spend||[]).filter(function(t){return t.ym===ym;});
+  if(!T.length){$("spOut").innerHTML='<p class="note">Nothing snapped for '+ymLabel(ym)+' yet. (Uses the month picked in Monthly bills.)</p>';return;}
+  var max=cats.length?sp[cats[0]]:1,avg3=function(c){var v=[1,2,3].map(function(k){return spendFor(ymShift(ym,-k))[c]||0;}),n=[1,2,3].filter(function(k){return (STATE.spend||[]).some(function(t){return t.ym===ymShift(ym,-k);});}).length;return n?v.reduce(function(a,b){return a+b;},0)/n:null;};
+  var over=cats.map(function(c){var a=avg3(c);return {c:c,ex:a!==null&&sp[c]>a*1.1?sp[c]-a:0,a:a};}).filter(function(x){return x.ex>0;}).sort(function(a,b){return b.ex-a.ex;}).slice(0,2);
+  var h='<h3>'+ymLabel(ym)+' spending by category</h3>';
+  cats.forEach(function(c){var o=over.filter(function(x){return x.c===c;})[0];h+='<div style="font:14px Arial,Helvetica,sans-serif;margin:6px 0"><div style="display:flex;justify-content:space-between"><span>'+c+(o?' <span class="creep">over your 3-month average ('+m2(o.a)+')</span>':'')+'</span><b>'+m2(sp[c])+'</b></div><div style="height:8px;background:#ece7dc;border-radius:99px"><div style="height:8px;border-radius:99px;background:#b5541c;width:'+(100*sp[c]/max)+'%"></div></div></div>';});
+  h+='<div class="scroll" style="margin-top:10px"><table><tr><th class="l">Date</th><th class="l">Store</th><th>Amount</th><th class="l">Category</th><th></th></tr>';
+  T.sort(function(a,b){return a.date<b.date?-1:1;}).forEach(function(t){h+='<tr><td class="l">'+esc(t.date.slice(5))+'</td><td class="l">'+esc(t.merchant)+'</td><td>'+(t.kind==="credit"?'<span class="note">payment/credit</span> ':'')+m2(t.amt)+'</td><td class="l">'+(t.kind==="credit"?'<span class="note">not counted</span>':'<select data-spcat="'+t.id+'">'+CATS.map(function(c){return '<option'+(c===t.cat?' selected':'')+'>'+c+'</option>';}).join("")+'</select>')+'</td><td><button data-spdel="'+t.id+'">x</button></td></tr>';});
+  $("spOut").innerHTML=h+'</table></div><p class="note">Fix a category and grandpa remembers it for that store next time.</p>';
+}
+function handleSpendFiles(files,isPdf){
+  var type=raw("spType"),busy=$("spBusy"),chain=Promise.resolve(),count=0;
+  Array.prototype.forEach.call(files,function(f){chain=chain.then(function(){busy.textContent="Reading "+f.name+" on this phone...";
+    if(isPdf)return pdfPages(f).then(function(pages){var lines=[].concat.apply([],pages);var L=type==="receipt"?parseReceipt(lines.join("\n")):parseStatement(lines);addTxns(L,"pdf");count+=L.length;});
+    return compress(f).then(function(b){var keep=!$("spDelPhoto").checked,id="spend|"+Date.now();return (keep?idbPut(id,b):Promise.resolve()).then(function(){return ocr(b);});}).then(function(text){var L=type==="receipt"?parseReceipt(text):parseStatement(text.split(/\n/));addTxns(L,"photo");count+=L.length;});
+  }).catch(function(){});});
+  chain.then(function(){busy.textContent=count?"Found "+count+" line"+(count===1?"":"s")+". Check the categories below.":"Couldn't read any amounts. Try a clearer, flatter photo.";all();});
+}
+
+/* ---------- 8. RRSP room ---------- */
+function rrspMax(y){if(RRSP_MAX[y])return {v:RRSP_MAX[y],est:false};var v=RRSP_MAX[2028];for(var k=2029;k<=y;k++)v*=1.02;return {v:Math.round(v/10)*10,est:true};}
+function rrsp(){
+  var typed=raw("rrIncome")!=="",inc=typed?num("rrIncome"):estIncome().v,est=!typed&&inc>0,pa=num("rrPa"),carry=num("rrCarry"),mx=rrspMax(thisYear).v;
+  $("rrGrowRow").style.display=$("rrProj").checked?"":"none";
+  if(!(inc>0)){$("rrOut").innerHTML='<div class="hint">Put in last year\'s employment income (or snap a pay stub) to see your RRSP room.</div>';$("rrProjOut").innerHTML="";return;}
+  var base=Math.min(inc*.18,mx),room=Math.max(0,base-pa+carry);
+  $("rrOut").innerHTML='<p>18% of '+money(inc)+(est?' (estimate from your pay stub year-to-date)':'')+' is '+money(inc*.18)+'. The '+thisYear+' cap is '+money(mx)+' (canada.ca). So the new room is '+money(base)+(pa?', minus '+money(pa)+' pension adjustment':'')+(carry?', plus '+money(carry)+' carried forward':'')+'.</p><div class="out">'+box(money(room),"RRSP room for "+thisYear,brk(room))+'</div>';
+  if(!$("rrProj").checked){$("rrProjOut").innerHTML="";return;}
+  if(!CD){$("rrProjOut").innerHTML='<p class="note">Fill in your birthday up top to project to retirement.</p>';return;}
+  var g=num("rrGrow")/100,cum=room,t='<div class="scroll"><table><tr><th>Year</th><th>Age</th><th>Income the year before</th><th>Yearly cap</th><th>New room</th><th>Total if unused</th></tr>';
+  for(var y=thisYear+1;y<=CD.ret.getFullYear();y++){var ip=inc*Math.pow(1+g,y-thisYear),m=rrspMax(y),nr=Math.max(0,Math.min(ip*.18,m.v)-pa);cum+=nr;
+    t+='<tr><td>'+y+'</td><td>'+(y-CD.by)+'</td><td>'+money(ip)+'</td><td>'+money(m.v)+(m.est?'*':'')+'</td><td>'+money(nr)+'</td><td>'+money(cum)+'</td></tr>';}
+  $("rrProjOut").innerHTML=t+'</table></div><p class="note">Estimate. Income grows '+(g*100)+'% a year. Caps for 2027 ($35,390) and 2028 ($36,390) are published by CRA; * later caps assume about 2% a year.</p>';
+}
+
+/* ---------- 9. my benefits ---------- */
+var TOPICS={glasses:["Glasses/eye exams",["vision","eyewear","eyeglasses","glasses","optical","lenses","frames","contact lenses","contacts","optometrist","eye exam","eye examination","laser eye"]],
+ drugs:["Prescriptions/drugs",["prescription","prescriptions","drug","drugs","medication","medications","pharmacy","dispensing fee","formulary","generic"]],
+ dental:["Dental (basic/major/ortho)",["dental","dentist","basic","major","orthodontic","orthodontics","braces","crowns","cleaning","recall","fillings","endodontic","periodontic"]],
+ massage:["Massage/physio/chiro",["massage","massage therapy","massage therapist","registered massage","rmt","physiotherapy","physiotherapist","physio","chiropractor","chiropractic","chiro","paramedical","practitioner"]],
+ mental:["Mental health/counselling",["mental health","counselling","counseling","psychologist","psychotherapy","social worker","counsellor","employee assistance","eap"]],
+ disability:["Disability (STD/LTD)",["disability","short term disability","long term disability","short-term disability","long-term disability","std","ltd","weekly indemnity","income replacement","elimination period","waiting period"]],
+ life:["Life insurance",["life insurance","basic life","ad&d","accidental death","dismemberment","beneficiary","optional life"]],
+ hsa:["Health spending account",["health spending account","hsa","health care spending","spending account","wellness account"]],
+ travel:["Travel medical",["travel","out-of-country","out of country","out of province","emergency medical","travel assistance"]],
+ dependants:["Dependants/spouse",["dependant","dependent","dependants","dependents","spouse","children","child","family coverage","single coverage","student"]]};
+var BEN=null;
+function bnLoad(){return idbGet("benefits").then(function(b){BEN=b||null;bnStatus();}).catch(function(){});}
+function bnStatus(){$("bnStatus").innerHTML=BEN?'<div class="good">Booklet loaded on this phone: '+BEN.clauses.length+' sections from '+BEN.pages+' page'+(BEN.pages===1?'':'s')+'. The original photos/PDF were thrown out after reading.</div>':'<p class="note">No booklet loaded yet.</p>';
+  var on=$("bnConsent").checked;["bnCam","bnPdf"].forEach(function(id){$(id).disabled=!on;});["bnCamLbl","bnPdfLbl"].forEach(function(id){$(id).style.opacity=on?1:.45;$(id).style.pointerEvents=on?"":"none";});}
+function toClauses(pages){var out=[];pages.forEach(function(lines,pi){var cur=[];function push(){var t=cur.join(" ").replace(/\s+/g," ").trim();if(t.length>15)out.push({page:pi+1,text:t});cur=[];}
+  lines.forEach(function(l){var head=l.length<=70&&(/^[A-Z0-9 &\/,'()-]{4,}$/.test(l)||/:$/.test(l)||/^(\d+(\.\d+)*|[A-Z])[.)]\s/.test(l));if(head&&cur.length)push();cur.push(l);if(cur.join(" ").length>600)push();});push();});return out;}
+function bnProcess(files,isPdf){
+  var busy=$("bnBusy");busy.textContent="Reading your booklet on this phone. This can take a minute...";
+  var p=isPdf?pdfPages(files[0]):Array.prototype.reduce.call(files,function(ch,f){return ch.then(function(acc){return compress(f,1600).then(ocr).then(function(t){acc.push(t.split(/\n/).map(function(s){return s.trim();}).filter(Boolean));return acc;});});},Promise.resolve([]));
+  p.then(function(pages){var cl=toClauses(pages);BEN={pages:pages.length,clauses:cl,when:new Date().toISOString()};return idbPut("benefits",BEN);}).then(function(){$("bnCam").value="";$("bnPdf").value="";busy.textContent="Done. Only the words were kept; the files were not saved.";bnStatus();}).catch(function(){busy.textContent="Couldn't read that one. Try a clearer photo or the PDF.";});
+}
+function bnAsk(q,topicKey){
+  if(!BEN||!BEN.clauses.length){$("bnOut").innerHTML='<div class="hint">Load your booklet first (tick the box, then snap the pages or load the PDF).</div>';return;}
+  var terms=[];if(topicKey)terms=TOPICS[topicKey][1].slice();
+  else{var ql=q.toLowerCase();Object.keys(TOPICS).forEach(function(k){if(TOPICS[k][1].some(function(s){return ql.indexOf(s)>=0||s.split(" ").some(function(w){return w.length>3&&ql.split(/\W+/).indexOf(w)>=0;});}))terms=terms.concat(TOPICS[k][1]);});
+    ql.split(/\W+/).filter(function(w){return w.length>3&&["covered","cover","does","what","much","have","with","from","about","plan"].indexOf(w)<0;}).forEach(function(w){terms.push(w);});}
+  terms=terms.filter(function(t,i){return terms.indexOf(t)===i;});
+  var scored=BEN.clauses.map(function(c){var lt=c.text.toLowerCase(),s=0;terms.forEach(function(t){var re=new RegExp("\\b"+t.replace(/[.*+?^${}()|[\]\\&]/g,"\\$&")+"\\b","g"),n=(lt.match(re)||[]).length;s+=n*(t.indexOf(" ")>=0?2:1);});return {c:c,s:s};}).filter(function(x){return x.s>0;}).sort(function(a,b){return b.s-a.s;}).slice(0,3);
+  if(!scored.length){$("bnOut").innerHTML='<div class="warn">Couldn\'t find it; that may mean it\'s not covered; call your plan.</div>';return;}
+  var top=scored[0].c.text,bits=[];
+  var pr=/(?:^|[^\d.])(\d{1,3}(?:\.\d+)?)\s?%/g,pm,pc=0;while((pm=pr.exec(top))&&pc<2){bits.push(pm[1]+"%");pc++;}
+  var wk=top.match(/(?:up to|for)\s+\d+\s+weeks/i);if(wk)bits.push(wk[0]);
+  var dl=top.match(/deductible[^.]*/i),dla=dl?(dl[0].match(/\$\s?[\d,]+(?:\.\d{2})?/)||[null])[0]:null,re=/\$\s?[\d,]+(?:\.\d{2})?/g,mm,ups=[];
+  while((mm=re.exec(top))&&ups.length<2){var after=top.slice(mm.index,mm.index+40).toLowerCase();if(dl&&top.indexOf(dl[0])<=mm.index&&mm.index<top.indexOf(dl[0])+dl[0].length)continue;if(/dispensing|deductible/.test(after))continue;ups.push(mm[0].replace(/\s/,""));}
+  ups.forEach(function(x){bits.push("up to "+x);});
+  var fq=top.match(/(?:once\s+)?(?:per|every|each)\s+(?:\d+\s+)?(?:consecutive\s+|calendar\s+|benefit\s+)?(?:months?|years?|visits?|treatments?)/i);if(fq)bits.push(fq[0].replace(/^per /i,"per ").toLowerCase());
+  var vis=top.match(/\b\d+\s+(?:visits|treatments|sessions)\b/i);if(vis)bits.push(vis[0]);
+  if(dla)bits.push("deductible "+dla.replace(/\s/,""));
+  bits.push("page "+scored[0].c.page);
+  function hl(t){var s=esc(t);terms.slice().sort(function(a,b){return b.length-a.length;}).forEach(function(w){s=s.replace(new RegExp("\\b("+esc(w).replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")\\b","gi"),"<mark>$1</mark>");});return s;}
+  $("bnOut").innerHTML='<div class="good"><b>Looks like: '+esc(bits.join(", "))+'</b></div>'+scored.map(function(x){return '<div class="clause"><div class="note" style="margin:0 0 4px">Page '+x.c.page+'</div>'+hl(x.c.text)+'</div>';}).join("");
+}
+
+/* ---------- 10. whole crew ---------- */
+var crewRate=6;
+function fv(a,r,n){return n<=0?0:(r===0?a*n:a*(Math.pow(1+r,n)-1)/r);}
+function crew(){
+  var N=Math.max(1,Math.min(60,Math.round(num("crewN")))),per=num("crewHitch")*(PLAN?PLAN.hitches:13),r=crewRate/100,yg=Math.round(num("crewYoung")),od=Math.round(num("crewOld")),ret=Math.round(num("crewRet"));
+  var h='<div class="out">'+box(money(per),"each person, a year",brk(per))+'</div>';
+  if(per>LIMIT_NOW)h+='<div class="warn">'+money(per)+' a year is more than the '+money(LIMIT_NOW)+' of new room each person gets a year. Fine for folks with unused room; others need another account for the extra.</div>';
+  if(CD){var one=fv(per,r,CD.bdays);h+='<p>If all '+N+' of you started today and had '+CD.bdays+' years like you:</p><div class="out">'+box(money(one),"each person at "+crewRate+"%")+box(money(one*N),"the whole crew, added up")+'</div>';}
+  var ages=[];for(var i=0;i<N;i++)ages.push(N===1?yg:Math.round(yg+(od-yg)*i/(N-1)));
+  var rows=ages.map(function(a,i){var n=Math.max(0,ret-a);return {i:i,a:a,n:n,v:fv(per,r,n)};}),tot=rows.reduce(function(s,x){return s+x.v;},0);
+  h+='<h3>Crew of '+N+', same plan, staggered ages</h3><table><tr><th class="l">Crew member</th><th>Age now</th><th>Years to '+ret+'</th><th>At '+ret+'</th></tr>'+rows.map(function(x){return '<tr'+((x.i===0||x.i===N-1)?' class="hit"':'')+'><td class="l">'+(x.i===0?'Youngest':x.i===N-1?'Oldest':'Hand '+(x.i+1))+'</td><td>'+x.a+'</td><td>'+x.n+'</td><td>'+money(x.v)+'</td></tr>';}).join("")+'<tr class="hit"><td class="l">Crew total</td><td></td><td></td><td>'+money(tot)+'</td></tr></table>';
+  if(N>1)h+='<div class="hint">Same '+money(num("crewHitch"))+' a hitch. The youngest ends up with '+money(rows[0].v)+', the oldest with '+money(rows[N-1].v)+'. That gap is just time. Tell the young guys.</div>';
+  h+='<p class="note">Each person has their own TFSA in their own name. No pooled account, nobody shares money, and you don\'t need anybody\'s name or numbers to use this.</p>';
+  $("crewOut").innerHTML=h;
+}
+
+/* ---------- wiring ---------- */
+function all(){runway();hitch();otherMoney();stub();debtPlan();renderBills();assess();renderSpend();rrsp();crew();stack();}
+function restoreInputs(){var I=STATE.inputs||{};document.querySelectorAll(".sv").forEach(function(e){if(I[e.id]!==undefined){if(e.type==="checkbox")e.checked=!!I[e.id];else e.value=I[e.id];}});var F=STATE.feedback||{};document.querySelectorAll("[data-fb]").forEach(function(e){var k=e.getAttribute("data-fb");if(F[k]!==undefined)e.value=F[k];});
+  if(I.otRoute){var r=document.querySelector('input[name=otRoute][value="'+I.otRoute+'"]');if(r)r.checked=true;}if(I.shN)shN=+I.shN||0;if(I.crewRate)crewRate=+I.crewRate;
+  document.querySelectorAll("#crewRate button").forEach(function(b){b.classList.toggle("on",+b.getAttribute("data-r")===crewRate);});}
+function init(){
+  loadState();prefillDebts();$("billMonth").value=ymKey(today);buildOther();restoreInputs();renderDebtRows();
+  $("bnQuick").innerHTML=Object.keys(TOPICS).map(function(k){return '<button data-topic="'+k+'">'+TOPICS[k][0]+'</button>';}).join("");
+  document.addEventListener("input",function(e){var t=e.target;
+    if(t.classList.contains("sv")){STATE.inputs[t.id]=t.type==="checkbox"?t.checked:t.value;}
+    else if(t.classList.contains("svr")){STATE.inputs.otRoute=t.value;}
+    else if(t.hasAttribute("data-om")){var k=t.getAttribute("data-om");STATE.other[k]=STATE.other[k]||{};STATE.other[k][t.getAttribute("data-f")]=t.value;}
+    else if(t.hasAttribute("data-db")){var d=STATE.debts[+t.getAttribute("data-db")];d[t.getAttribute("data-f")]=t.type==="checkbox"?t.checked:t.value;}
+    else if(t.hasAttribute("data-bill")){var b=billsFor(curYm(),true).filter(function(x){return x.id===t.getAttribute("data-bill");})[0];if(b){b.amt=t.value;b.sug=false;}saveState();assess();return;}
+    else if(t.hasAttribute("data-spcat")){var tx=STATE.spend.filter(function(x){return x.id===t.getAttribute("data-spcat");})[0];if(tx){var key=mKey(tx.merchant);STATE.cats[key]=t.value;STATE.spend.forEach(function(x){if(mKey(x.merchant)===key&&x.kind==="spend")x.cat=t.value;});}}
+    else if(t.id==="billMonth"){all();return;}
+    else if(t.id==="bnConsent"){bnStatus();return;}
+    else if(t.hasAttribute("data-fb")){STATE.feedback=STATE.feedback||{};STATE.feedback[t.getAttribute("data-fb")]=t.value;saveState();return;}
+    else return;
+    saveState();if(!t.hasAttribute("data-db")||t.type==="checkbox"||t.tagName==="SELECT")all();else{debtPlan();assess();otherMoney();}
+  });
+  document.addEventListener("change",function(e){var t=e.target;
+    if(t.hasAttribute("data-bill")){renderBills();return;}
+    if(t.hasAttribute("data-billphoto")&&t.files&&t.files[0]){var ym=curYm(),id=t.getAttribute("data-billphoto"),b=billsFor(ym,true).filter(function(x){return x.id===id;})[0];
+      compress(t.files[0]).then(function(blob){return idbPut("bill|"+ym+"|"+id,blob).then(function(){b.photo=true;saveState();renderBills();var th=$("th_"+id);if(th)th.insertAdjacentHTML("beforeend",'<div class="busy" id="ocr_'+id+'">Trying to read the amount...</div>');return ocr(blob);});}).then(function(text){var s=text?suggestDue(text):null;if(s&&!(parseFloat(b.amt)>0)){b.amt=String(s);b.sug=true;saveState();}renderBills();assess();});}
+    else if(t.id==="stubCam"&&t.files&&t.files[0]){$("stubBusy").textContent="Reading your stub on this phone...";compress(t.files[0],1600).then(function(blob){return idbPut("stub",blob).then(function(){showStub();return ocr(blob);});}).then(function(text){if(text)parseStub(text);saveState();$("stubBusy").textContent=text?"Filled in what I could read. Check every box.":"Couldn't read it. Type the numbers in.";all();});}
+    else if(t.id==="spCam"&&t.files.length){handleSpendFiles(t.files,false);t.value="";}
+    else if(t.id==="spPdf"&&t.files.length){handleSpendFiles(t.files,true);t.value="";}
+    else if(t.id==="bnCam"&&t.files.length){bnProcess(t.files,false);}
+    else if(t.id==="bnPdf"&&t.files.length){bnProcess(t.files,true);}
+  });
+  document.addEventListener("click",function(e){var t=e.target;if(t.tagName!=="BUTTON")return;var ym=curYm();
+    if(t.hasAttribute("data-billdelphoto")){var id=t.getAttribute("data-billdelphoto");idbDel("bill|"+ym+"|"+id).then(function(){billsFor(ym).forEach(function(b){if(b.id===id){b.photo=false;b.sug=false;}});saveState();renderBills();});}
+    else if(t.hasAttribute("data-billdel")){var id2=t.getAttribute("data-billdel"),L=billsFor(ym),b=L.filter(function(x){return x.id===id2;})[0];idbDel("bill|"+ym+"|"+id2).catch(function(){});if(b.std){b.amt="";b.photo=false;b.sug=false;}else STATE.bills[ym]=L.filter(function(x){return x.id!==id2;});saveState();all();}
+    else if(t.id==="addBill"){var nm=raw("newBillName")||"Other bill";billsFor(ym,true).push({id:"c"+Date.now().toString(36),name:nm,amt:"",photo:false,std:false});$("newBillName").value="";saveState();all();}
+    else if(t.id==="shPlus"||t.id==="shMinus"){shN=Math.max(0,Math.min(31,shN+(t.id==="shPlus"?1:-1)));STATE.inputs.shN=shN;saveState();all();}
+    else if(t.id==="stackAdd"){var add=(STUB?STUB.total:0)*otShare().tfsa;if(add>0){STATE.stack.fund=Math.round((STATE.stack.fund+add)*100)/100;saveState();all();}}
+    else if(t.id==="stackMoveAll"){moveToTfsa(STATE.stack.fund);}
+    else if(t.id==="stackMoveSome"){moveToTfsa(num("moveAmt"));$("moveAmt").value="";}
+    else if(t.id==="stackReset"){if(confirm("Reset your Stacking fund and moved amounts on this phone?")){STATE.stack={fund:0,moved:[],year:thisYear};saveState();all();}}
+    else if(t.id==="stubDel"){idbDel("stub").then(showStub);}
+    else if(t.id==="dbAdd"){STATE.debts.push({name:"",type:"",bal:"",rate:"",min:"",missed:false,nMissed:"",pastDue:""});saveState();renderDebtRows();all();}
+    else if(t.hasAttribute("data-dbrm")){STATE.debts.splice(+t.getAttribute("data-dbrm"),1);saveState();renderDebtRows();all();}
+    else if(t.id==="dbSwitch"){$("debtFirst").checked=true;STATE.inputs.debtFirst=true;saveState();all();}
+    else if(t.hasAttribute("data-spdel")){STATE.spend=STATE.spend.filter(function(x){return x.id!==t.getAttribute("data-spdel");});saveState();all();}
+    else if(t.hasAttribute("data-topic")){bnAsk("",t.getAttribute("data-topic"));}
+    else if(t.id==="bnDelete"){if(confirm("Delete your benefits info from this phone?")){idbDel("benefits").then(function(){BEN=null;bnStatus();$("bnOut").innerHTML="";});}}
+    else if(t.hasAttribute("data-r")){crewRate=+t.getAttribute("data-r");STATE.inputs.crewRate=crewRate;document.querySelectorAll("#crewRate button").forEach(function(b){b.classList.toggle("on",b===t);});saveState();crew();}
+  });
+  $("bnQ").addEventListener("keydown",function(e){if(e.key==="Enter")bnAsk($("bnQ").value,null);});
+  showStub();bnLoad();all();
+}
+function showStub(){idbGet("stub").then(function(b){$("stubThumb").innerHTML=b?'<img alt="Pay stub photo" style="max-width:220px;border-radius:8px;border:1px solid var(--line)" src="'+URL.createObjectURL(b)+'">':'';$("stubDel").style.display=b?"":"none";}).catch(function(){});}
+init();
+</script>
+</body>
+</html>
